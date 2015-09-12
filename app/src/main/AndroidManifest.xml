@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.bischof.raphael.gothiite" >
 
-    <!-- Include required permissions for Google Mobile Ads to run. -->
+    <!-- Include required permissions for Google Mobile Ads and Parse.com to run. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -10,6 +10,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".GotHiiteApplication"
         android:theme="@style/AppTheme" >
 
         <!-- This meta-data tag is required to use Google Play Services. -->
@@ -18,7 +19,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

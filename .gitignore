@@ -25,6 +25,13 @@ proguard/
 # Log Files
 *.log
 
+# Folder info
+*.iml
+
+# IDE Config
+.idea
+
+
 # =========================
 # Operating System Files
 # =========================

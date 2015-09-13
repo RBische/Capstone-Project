@@ -39,6 +39,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.bischof.raphael.gothiite.activity.MainActivity" />
         </activity>
+
+        <provider
+            android:name=".data.RunProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false"
+            android:syncable="true" />
     </application>
 
 </manifest>

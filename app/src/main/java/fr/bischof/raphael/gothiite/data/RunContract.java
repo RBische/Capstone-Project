@@ -53,7 +53,6 @@ public class RunContract  {
         public static Uri buildRunUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
     }
 
     /* Inner class that defines the table contents of the run interval table */

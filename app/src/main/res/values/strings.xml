@@ -1,8 +1,6 @@
 <resources>
-    <string name="app_name">GotHiite</string>
-
-    <string name="action_settings">Settings</string>
-
+    <string name="app_name" translatable="false">GotHiite</string>
+    <string name="content_authority" translatable="false">fr.bischof.raphael.gothiite</string>
     <string name="action_signup_signin">Sign up/Sign in</string>
     <string name="title_activity_connection">Connection</string>
     <string name="hello_world">Hello world!</string>
@@ -14,4 +12,8 @@
     <string name="error_connection">Unable to connect, have you got internet connection ?</string>
     <string name="error_sign_in">An account already exists with this login but the password is wrong</string>
     <string name="action_log_out">Log out</string>
+    <string name="leger_test_description">Speed increase each 2 minute</string>
+    <string name="leger_test_name">Leger-test</string>
+    <string name="tabata_description">20s effort * 8 + 10s rest * 8</string>
+    <string name="tabata">Tabata</string>
 </resources>

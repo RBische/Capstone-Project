@@ -43,7 +43,7 @@
         <provider
             android:name=".data.RunProvider"
             android:authorities="@string/content_authority"
-            android:exported="false"
+            android:exported="true"
             android:syncable="true" />
     </application>
 

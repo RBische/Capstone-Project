@@ -16,7 +16,7 @@ import fr.bischof.raphael.gothiite.R;
 public class RunDbHelper  extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private Context mContext;
 
     static final String DATABASE_NAME = "run.db";
@@ -34,7 +34,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
                 RunContract.RunEntry.COLUMN_AVG_SPEED + " REAL NOT NULL, " +
                 RunContract.RunEntry.COLUMN_RUN_TYPE_ID + " TEXT NOT NULL, " +
                 RunContract.RunEntry.COLUMN_START_DATE + " INTEGER NOT NULL, " +
-                RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT + " REAL NOT NULL " +
+                RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT + " REAL NOT NULL, " +
                 " FOREIGN KEY (" + RunContract.RunEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
                 RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
 
@@ -64,13 +64,12 @@ public class RunDbHelper  extends SQLiteOpenHelper {
 
         final String SQL_CREATE_RUN_TYPE_INTERVAL_TABLE = "CREATE TABLE " + RunContract.RunTypeIntervalEntry.TABLE_NAME + " (" +
                 RunContract.RunTypeIntervalEntry._ID + " TEXT PRIMARY KEY," +
-                RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO + " REAL NOT NULL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO + " REAL, " +
                 RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " TEXT NOT NULL, " +
                 RunContract.RunTypeIntervalEntry.COLUMN_EFFORT + " INTEGER NOT NULL, " +
                 RunContract.RunTypeIntervalEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED + " REAL NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED + " REAL NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO + " REAL NOT NULL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED + " REAL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO + " REAL, " +
                 " FOREIGN KEY (" + RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
                 RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
 

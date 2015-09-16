@@ -48,10 +48,14 @@ public class RunContract  {
         public static final String COLUMN_AVG_SPEED = "average_speed";
         public static final String COLUMN_VVO2MAX_EQUIVALENT = "vVO2maxEquivalent";
         public static final String COLUMN_START_DATE = "start_date";
-        public static final String COLUMN_RUN_TYPE_ID = "city_name";
+        public static final String COLUMN_RUN_TYPE_ID = "runTypeId";
 
         public static Uri buildRunUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildRunsUri() {
+            return CONTENT_URI;
         }
     }
 
@@ -69,7 +73,7 @@ public class RunContract  {
         public static final String TABLE_NAME = "runInterval";
 
         public static final String COLUMN_DISTANCE_DONE = "distance_done";
-        public static final String COLUMN_ORDER = "order";
+        public static final String COLUMN_ORDER = "ordering";
         public static final String COLUMN_START_POSITION_LATITUDE = "start_position_latitude";
         public static final String COLUMN_START_POSITION_LONGITUDE = "start_position_longitude";
         public static final String COLUMN_END_POSITION_LATITUDE = "end_position_latitude";
@@ -82,6 +86,9 @@ public class RunContract  {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildRunIntervalsUri() {
+            return CONTENT_URI;
+        }
     }
 
     /* Inner class that defines the table contents of the run interval table */
@@ -122,7 +129,7 @@ public class RunContract  {
         // Table name
         public static final String TABLE_NAME = "runTypeInterval";
 
-        public static final String COLUMN_ORDER = "order";
+        public static final String COLUMN_ORDER = "ordering";
         public static final String COLUMN_TIME_TO_DO = "time_to_do";
         public static final String COLUMN_DISTANCE_TO_DO = "distance_to_do";
         public static final String COLUMN_SPEED_ESTIMATED = "speed_estimated";

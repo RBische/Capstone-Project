@@ -19,6 +19,7 @@ import com.parse.SignUpCallback;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -83,6 +84,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                 ParseUser.logOut();
                 showInterfaceDependingOnCurrentUser();
             }else{
+                mBtnSubmit.setEnabled(false);
                 if (mEtLogin.getText().toString().length()>3&&mEtPassword.getText().toString().length()>3){
                     ParseUser user = new ParseUser();
                     user.setUsername(mEtLogin.getText().toString());
@@ -99,13 +101,16 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                                             if (user != null) {
                                                 successfulLogin();
                                             } else if (e.getCode() == 101) {
+                                                mBtnSubmit.setEnabled(true);
                                                 mTvError.setText(getString(R.string.error_sign_in));
                                             }else{
+                                                mBtnSubmit.setEnabled(true);
                                                 mTvError.setText(getString(R.string.error_connection));
                                             }
                                         }
                                     });
                                 }else{
+                                    mBtnSubmit.setEnabled(true);
                                     mTvError.setText(getString(R.string.error_connection));
                                 }
                             }
@@ -119,6 +124,7 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
     }
 
     private void successfulLogin() {
+        GothiiteSyncAdapter.syncImmediately(getActivity());
         Toast.makeText(getActivity(),getString(R.string.successfully_logged_in),Toast.LENGTH_SHORT).show();
         if (mListener!=null){
             mListener.onConnectionSuccessful();

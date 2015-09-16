@@ -17,6 +17,7 @@ public class RunProvider extends ContentProvider {
 
     public static final int RUNS = 100;
     public static final int RUN = 101;
+    public static final int RUN_INTERVALS = 200;
     public static final int RUN_INTERVAL = 201;
     public static final int RUN_TYPE = 301;
     public static final int RUN_TYPE_INTERVAL = 401;
@@ -25,17 +26,17 @@ public class RunProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private RunDbHelper mOpenHelper;
     private static final SQLiteQueryBuilder sRunsQueryBuilder;
+    private static final SQLiteQueryBuilder sRunIntervalsQueryBuilder;
 
     static{
         sRunsQueryBuilder = new SQLiteQueryBuilder();
         sRunsQueryBuilder.setTables(
-                RunContract.RunEntry.TABLE_NAME + " INNER JOIN " +
-                        RunContract.RunTypeEntry.TABLE_NAME +
-                        " ON " + RunContract.RunEntry.TABLE_NAME +
-                        "." + RunContract.RunEntry.COLUMN_RUN_TYPE_ID +
-                        " = " + RunContract.RunTypeEntry.TABLE_NAME +
-                        "." + RunContract.RunTypeEntry._ID);
+                RunContract.RunEntry.TABLE_NAME );
+        sRunIntervalsQueryBuilder = new SQLiteQueryBuilder();
+        sRunIntervalsQueryBuilder.setTables(
+                RunContract.RunIntervalEntry.TABLE_NAME );
     }
+
 
     static UriMatcher buildUriMatcher() {
         // All paths added to the UriMatcher have a corresponding code to return when a match is
@@ -47,6 +48,7 @@ public class RunProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, RunContract.PATH_RUN, RUNS);
         matcher.addURI(authority, RunContract.PATH_RUN + "/*", RUN);
+        matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL , RUN_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL + "/*", RUN_INTERVAL);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVAL);
@@ -64,10 +66,14 @@ public class RunProvider extends ContentProvider {
                         String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            // "weather/*/*"
             case RUNS:
             {
                 retCursor = getRuns(projection, sortOrder);
+                break;
+            }
+            case RUN_INTERVALS:
+            {
+                retCursor = getRunIntervals(projection, sortOrder);
                 break;
             }
             default:
@@ -79,8 +85,18 @@ public class RunProvider extends ContentProvider {
         return retCursor;
     }
 
-    private Cursor getRuns(String[] projection, String sortOrder) {
+    private Cursor getRunIntervals(String[] projection, String sortOrder) {
+        return sRunIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
+    private Cursor getRuns(String[] projection, String sortOrder) {
         return sRunsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 null,
@@ -102,6 +118,8 @@ public class RunProvider extends ContentProvider {
                 return RunContract.RunEntry.CONTENT_TYPE;
             case RUN:
                 return RunContract.RunEntry.CONTENT_ITEM_TYPE;
+            case RUN_INTERVALS:
+                return RunContract.RunIntervalEntry.CONTENT_ITEM_TYPE;
             case RUN_INTERVAL:
                 return RunContract.RunIntervalEntry.CONTENT_ITEM_TYPE;
             case RUN_TYPE:
@@ -159,6 +177,52 @@ public class RunProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return returnUri;
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case RUNS:
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(RunContract.RunEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return returnCount;
+            case RUN_INTERVALS:
+                db.beginTransaction();
+                int returnCountInterval = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(RunContract.RunIntervalEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCountInterval++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return returnCountInterval;
+            default:
+                return super.bulkInsert(uri, values);
+        }
     }
 
     @Override

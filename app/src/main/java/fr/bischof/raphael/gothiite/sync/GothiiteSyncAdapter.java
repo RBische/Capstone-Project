@@ -52,6 +52,18 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE,
             RunContract.RunIntervalEntry.COLUMN_ORDER,
             RunContract.RunIntervalEntry.COLUMN_RUN_ID};
+    private static final String[] RUN_TYPE_PROJECTION = {RunContract.RunTypeEntry._ID,
+            RunContract.RunTypeEntry.COLUMN_DESCRIPTION,
+            RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,
+            RunContract.RunTypeEntry.COLUMN_NAME,
+            RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING};
+    private static final String[] RUN_TYPE_INTERVAL_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
+            RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO,
+            RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO,
+            RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED,
+            RunContract.RunTypeIntervalEntry.COLUMN_ORDER,
+            RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
+            RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID};
     private ContentResolver mContentResolver;
 
     public GothiiteSyncAdapter(Context context, boolean autoInitialize) {
@@ -161,7 +173,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             List<ParseObject> runTypes = query.find();
             Uri runTypesUri = RunContract.RunTypeEntry.buildRunTypesUri();
-            Cursor runTypesData = mContentResolver.query(runTypesUri, RUN_PROJECTION, null, null, null);
+            Cursor runTypesData = mContentResolver.query(runTypesUri, RUN_TYPE_PROJECTION, null, null, null);
             ArrayList<ParseObject> runTypesToSend = new ArrayList<>();
             ArrayList<ContentValues> runTypesToSave = new ArrayList<>();
             if (runTypesData!=null){
@@ -235,7 +247,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 ids.add(runTypeToSend.getObjectId());
                 parameters.add("?");
             }
-            Cursor runTypeIntervalsData = mContentResolver.query(runTypeIntervalsUri,RUN_INTERVAL_PROJECTION,RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
+            Cursor runTypeIntervalsData = mContentResolver.query(runTypeIntervalsUri,RUN_TYPE_INTERVAL_PROJECTION,RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
             if (runTypeIntervalsData!=null) {
                 runTypeIntervalsData.moveToFirst();
                 while (!runTypeIntervalsData.isAfterLast()){

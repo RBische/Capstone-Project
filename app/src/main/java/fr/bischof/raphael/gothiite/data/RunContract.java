@@ -108,12 +108,14 @@ public class RunContract  {
         public static final String COLUMN_DISTANCE_GROWING = "distance_growing";
         public static final String COLUMN_CAN_BE_DELETED = "can_be_deleted";
         public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_USER_ID = "user_id";
 
         public static Uri buildRunTypeUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildRunTypesUri() {
+            return CONTENT_URI;
+        }
     }
 
     /* Inner class that defines the table contents of the run interval table */
@@ -140,5 +142,8 @@ public class RunContract  {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildRunTypeIntervalsUri() {
+            return CONTENT_URI;
+        }
     }
 }

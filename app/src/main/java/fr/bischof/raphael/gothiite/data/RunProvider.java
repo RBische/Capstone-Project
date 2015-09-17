@@ -19,7 +19,9 @@ public class RunProvider extends ContentProvider {
     public static final int RUN = 101;
     public static final int RUN_INTERVALS = 200;
     public static final int RUN_INTERVAL = 201;
+    public static final int RUN_TYPES = 300;
     public static final int RUN_TYPE = 301;
+    public static final int RUN_TYPE_INTERVALS = 400;
     public static final int RUN_TYPE_INTERVAL = 401;
 
     // The URI Matcher used by this content provider.
@@ -27,6 +29,8 @@ public class RunProvider extends ContentProvider {
     private RunDbHelper mOpenHelper;
     private static final SQLiteQueryBuilder sRunsQueryBuilder;
     private static final SQLiteQueryBuilder sRunIntervalsQueryBuilder;
+    private static final SQLiteQueryBuilder sRunTypesQueryBuilder;
+    private static final SQLiteQueryBuilder sRunTypeIntervalsQueryBuilder;
 
     static{
         sRunsQueryBuilder = new SQLiteQueryBuilder();
@@ -35,6 +39,12 @@ public class RunProvider extends ContentProvider {
         sRunIntervalsQueryBuilder = new SQLiteQueryBuilder();
         sRunIntervalsQueryBuilder.setTables(
                 RunContract.RunIntervalEntry.TABLE_NAME );
+        sRunTypesQueryBuilder = new SQLiteQueryBuilder();
+        sRunTypesQueryBuilder.setTables(
+                RunContract.RunTypeEntry.TABLE_NAME );
+        sRunTypeIntervalsQueryBuilder = new SQLiteQueryBuilder();
+        sRunTypeIntervalsQueryBuilder.setTables(
+                RunContract.RunTypeIntervalEntry.TABLE_NAME );
     }
 
 
@@ -50,7 +60,9 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN + "/*", RUN);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL , RUN_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL + "/*", RUN_INTERVAL);
+        matcher.addURI(authority, RunContract.PATH_RUN_TYPE, RUN_TYPES);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
+        matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL, RUN_TYPE_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVAL);
         return matcher;
     }
@@ -71,9 +83,19 @@ public class RunProvider extends ContentProvider {
                 retCursor = getRuns(projection, sortOrder);
                 break;
             }
+            case RUN_TYPES:
+            {
+                retCursor = getRunTypes(projection, sortOrder);
+                break;
+            }
             case RUN_INTERVALS:
             {
                 retCursor = getRunIntervals(projection, sortOrder);
+                break;
+            }
+            case RUN_TYPE_INTERVALS:
+            {
+                retCursor = getRunTypeIntervals(projection, sortOrder);
                 break;
             }
             default:
@@ -83,6 +105,28 @@ public class RunProvider extends ContentProvider {
             retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
         return retCursor;
+    }
+
+    private Cursor getRunTypeIntervals(String[] projection, String sortOrder) {
+        return sRunTypeIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getRunTypes(String[] projection, String sortOrder) {
+        return sRunTypesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     private Cursor getRunIntervals(String[] projection, String sortOrder) {
@@ -119,11 +163,15 @@ public class RunProvider extends ContentProvider {
             case RUN:
                 return RunContract.RunEntry.CONTENT_ITEM_TYPE;
             case RUN_INTERVALS:
-                return RunContract.RunIntervalEntry.CONTENT_ITEM_TYPE;
+                return RunContract.RunIntervalEntry.CONTENT_TYPE;
             case RUN_INTERVAL:
                 return RunContract.RunIntervalEntry.CONTENT_ITEM_TYPE;
+            case RUN_TYPES:
+                return RunContract.RunTypeEntry.CONTENT_TYPE;
             case RUN_TYPE:
                 return RunContract.RunTypeEntry.CONTENT_ITEM_TYPE;
+            case RUN_TYPE_INTERVALS:
+                return RunContract.RunTypeIntervalEntry.CONTENT_ITEM_TYPE;
             case RUN_TYPE_INTERVAL:
                 return RunContract.RunTypeIntervalEntry.CONTENT_ITEM_TYPE;
             default:
@@ -220,6 +268,42 @@ public class RunProvider extends ContentProvider {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
                 return returnCountInterval;
+            case RUN_TYPES:
+                db.beginTransaction();
+                int returnCountType = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(RunContract.RunTypeEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCountType++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return returnCountType;
+            case RUN_TYPE_INTERVALS:
+                db.beginTransaction();
+                int returnCountTypeInterval = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCountTypeInterval++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return returnCountTypeInterval;
             default:
                 return super.bulkInsert(uri, values);
         }

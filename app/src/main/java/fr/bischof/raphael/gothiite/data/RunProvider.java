@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 
 /**
  * Provider to fetch Runs from Gothiite App
@@ -17,6 +16,7 @@ public class RunProvider extends ContentProvider {
 
     public static final int RUNS = 100;
     public static final int RUN = 101;
+    public static final int RUNS_WITH_RUN_TYPE = 120;
     public static final int RUN_INTERVALS = 200;
     public static final int RUN_INTERVAL = 201;
     public static final int RUN_TYPES = 300;
@@ -31,11 +31,20 @@ public class RunProvider extends ContentProvider {
     private static final SQLiteQueryBuilder sRunIntervalsQueryBuilder;
     private static final SQLiteQueryBuilder sRunTypesQueryBuilder;
     private static final SQLiteQueryBuilder sRunTypeIntervalsQueryBuilder;
+    private static final SQLiteQueryBuilder sRunsWithRunTypeQueryBuilder;
 
     static{
         sRunsQueryBuilder = new SQLiteQueryBuilder();
         sRunsQueryBuilder.setTables(
                 RunContract.RunEntry.TABLE_NAME );
+        sRunsWithRunTypeQueryBuilder = new SQLiteQueryBuilder();
+        sRunsWithRunTypeQueryBuilder.setTables(
+                RunContract.RunEntry.TABLE_NAME+ " INNER JOIN " +
+                        RunContract.RunTypeEntry.TABLE_NAME +
+                        " ON " + RunContract.RunTypeEntry.TABLE_NAME +
+                        "." + RunContract.RunTypeEntry._ID +
+                        " = " + RunContract.RunEntry.TABLE_NAME +
+                        "." + RunContract.RunEntry.COLUMN_RUN_TYPE_ID );
         sRunIntervalsQueryBuilder = new SQLiteQueryBuilder();
         sRunIntervalsQueryBuilder.setTables(
                 RunContract.RunIntervalEntry.TABLE_NAME );
@@ -47,7 +56,6 @@ public class RunProvider extends ContentProvider {
                 RunContract.RunTypeIntervalEntry.TABLE_NAME );
     }
 
-
     static UriMatcher buildUriMatcher() {
         // All paths added to the UriMatcher have a corresponding code to return when a match is
         // found.  The code passed into the constructor represents the code to return for the root
@@ -57,6 +65,7 @@ public class RunProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, RunContract.PATH_RUN, RUNS);
+        matcher.addURI(authority, RunContract.PATH_RUN_WITH_RUN_TYPE, RUNS_WITH_RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN + "/*", RUN);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL , RUN_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL + "/*", RUN_INTERVAL);
@@ -74,13 +83,18 @@ public class RunProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs,
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case RUNS:
             {
                 retCursor = getRuns(projection, sortOrder);
+                break;
+            }
+            case RUNS_WITH_RUN_TYPE:
+            {
+                retCursor = getRunsWithRunType(projection, sortOrder);
                 break;
             }
             case RUN_TYPES:
@@ -95,7 +109,7 @@ public class RunProvider extends ContentProvider {
             }
             case RUN_TYPE_INTERVALS:
             {
-                retCursor = getRunTypeIntervals(projection, sortOrder);
+                retCursor = getRunTypeIntervals(projection, selection, selectionArgs, sortOrder);
                 break;
             }
             default:
@@ -107,11 +121,11 @@ public class RunProvider extends ContentProvider {
         return retCursor;
     }
 
-    private Cursor getRunTypeIntervals(String[] projection, String sortOrder) {
+    private Cursor getRunTypeIntervals(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return sRunTypeIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 sortOrder
@@ -140,6 +154,17 @@ public class RunProvider extends ContentProvider {
         );
     }
 
+    private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
+        return sRunsWithRunTypeQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getRuns(String[] projection, String sortOrder) {
         return sRunsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -152,7 +177,7 @@ public class RunProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(@NonNull Uri uri) {
+    public String getType(Uri uri) {
         // Use the Uri Matcher to determine what kind of URI this is.
         final int match = sUriMatcher.match(uri);
 
@@ -180,7 +205,7 @@ public class RunProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
+    public Uri insert(Uri uri, ContentValues contentValues) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
@@ -228,7 +253,7 @@ public class RunProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+    public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -310,12 +335,12 @@ public class RunProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, String s, String[] strings) {
+    public int delete(Uri uri, String s, String[] strings) {
         return 0;
     }
 
     @Override
-    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
         return 0;
     }
 }

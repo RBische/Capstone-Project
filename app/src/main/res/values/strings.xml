@@ -17,4 +17,7 @@
     <string name="leger_test_name">Leger-test</string>
     <string name="tabata_description">20s effort * 8 + 10s rest * 8</string>
     <string name="tabata">Tabata</string>
+    <string name="empty_run_list">Go for a run to add some content !</string>
+    <string name="kmh_vvo2max">km/h vVO2max</string>
+    <string name="ic_run">Session</string>
 </resources>

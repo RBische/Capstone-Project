@@ -7,4 +7,5 @@
 
     <!-- our detail accent colors -->
     <color name="detail_accent_pane_background">#455A64</color>
+    <color name="secondary_text">#727272</color>
 </resources>

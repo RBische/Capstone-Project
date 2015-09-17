@@ -187,7 +187,8 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 runTypesData.moveToFirst();
                 while (!runTypesData.isAfterLast()){
                     localCurrentRunTypesId.add(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)));
-                    if (!serverCurrentRunTypesId.contains(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)))){
+                    if (!serverCurrentRunTypesId.contains(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)))
+                            &&runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1){
                         ParseObject runTypeToSend = new ParseObject("RunType");
                         runTypeToSend.add("name", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
                         runTypeToSend.add("distanceGrowing", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING)) == 1);
@@ -272,7 +273,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             mContentResolver.bulkInsert(runTypeIntervalsUri, runTypeIntervalsToSave.toArray(new ContentValues[runTypeIntervalsToSave.size()]));
 
         } catch (ParseException e) {
-            Log.e(TAG, "Error retrieving runIntervals : " + e.getMessage());
+            Log.e(TAG, "Error retrieving runTypeIntervals : " + e.getMessage());
         }
     }
 

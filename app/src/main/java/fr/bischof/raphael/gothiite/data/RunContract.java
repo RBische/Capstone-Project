@@ -27,6 +27,7 @@ public class RunContract  {
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_RUN = "run";
+    public static final String PATH_RUN_WITH_RUN_TYPE = "run";
     public static final String PATH_RUN_INTERVAL = "runInterval";
     public static final String PATH_RUN_TYPE = "runtype";
     public static final String PATH_RUN_TYPE_INTERVAL = "runtypeInterval";
@@ -36,6 +37,8 @@ public class RunContract  {
     public static final class RunEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN).build();
+        public static final Uri CONTENT_JOINED_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN_WITH_RUN_TYPE).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN;
@@ -56,6 +59,10 @@ public class RunContract  {
 
         public static Uri buildRunsUri() {
             return CONTENT_URI;
+        }
+
+        public static Uri buildRunsWithRunTypeUri() {
+            return CONTENT_JOINED_URI;
         }
     }
 

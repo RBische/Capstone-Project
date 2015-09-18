@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,6 +9,7 @@
         android:id="@+id/col"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
         android:layout_above="@+id/adView">
 
         <android.support.design.widget.AppBarLayout
@@ -43,6 +44,20 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/share_fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            app:layout_anchor="@id/rvRuns"
+            android:src="@drawable/ic_add_white_48dp"
+            app:elevation="@dimen/fab_elevation"
+            android:contentDescription="@string/action_add_run"
+            app:layout_anchorGravity="bottom|right|end"
+            app:layout_behavior="fr.bischof.raphael.gothiite.ui.ScrollAwareFABBehavior" />
+
     </android.support.design.widget.CoordinatorLayout>
     <!-- empty list -->
     <TextView
@@ -64,8 +79,7 @@
     <!-- view for AdMob Banner Ad -->
     <com.google.android.gms.ads.AdView android:id="@+id/adView" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|center_horizontal"
         ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id" />
-</RelativeLayout>
+</FrameLayout>

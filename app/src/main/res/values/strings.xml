@@ -33,4 +33,5 @@
     <string name="kilometers_abreviation">km</string>
     <string name="icon_tabata">ico_run</string>
     <string name="icon_leger_test">ico_cone</string>
+    <string name="action_add_run">Add a session</string>
 </resources>

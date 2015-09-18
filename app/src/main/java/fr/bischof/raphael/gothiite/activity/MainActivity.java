@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(connectionIntent);
         }
         return super.onOptionsItemSelected(item);
-
     }
 
 }

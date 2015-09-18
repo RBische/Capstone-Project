@@ -18,7 +18,7 @@ import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.dateformat.DateToShowFormat;
 
 /**
- * Adapter to show run sessions
+ * Adapter that shows run sessions
  * Created by biche on 16/09/2015.
  */
 public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHolder> {
@@ -26,9 +26,12 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
     private final View mEmptyView;
     private Cursor mCursor;
 
-    public RunAdapter(Context context, View emptyView) {
+    final private RunAdapterOnClickHandler mClickHandler;
+
+    public RunAdapter(Context context, RunAdapterOnClickHandler dh, View emptyView) {
         this.mContext = context;
         this.mEmptyView = emptyView;
+        mClickHandler = dh;
     }
 
     @Override
@@ -70,7 +73,11 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
         return mCursor;
     }
 
-    public class RunAdapterViewHolder extends RecyclerView.ViewHolder {
+    public interface RunAdapterOnClickHandler {
+        void onClick(String runId, RunAdapterViewHolder vh);
+    }
+
+    public class RunAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mTvOtherDetail;
         public final TextView mTvTitle;
         public final TextView mTvSubtitle;
@@ -82,6 +89,15 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
             mTvSubtitle = (TextView) itemView.findViewById(R.id.tvSubtitle);
             mTvOtherDetail = (TextView) itemView.findViewById(R.id.tvOtherDetail);
             mIvRun = (ImageView) itemView.findViewById(R.id.ivRun);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
+            int dateColumnIndex = mCursor.getColumnIndex(RunContract.RunEntry._ID);
+            mClickHandler.onClick(mCursor.getString(dateColumnIndex), this);
         }
     }
 }

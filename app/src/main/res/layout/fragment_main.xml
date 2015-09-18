@@ -9,8 +9,7 @@
         android:id="@+id/col"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
-        android:layout_above="@+id/adView">
+        android:layout_marginBottom="50dp">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -45,7 +44,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/share_fab"
+            android:id="@+id/fabAdd"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_marginRight="@dimen/fab_margin"

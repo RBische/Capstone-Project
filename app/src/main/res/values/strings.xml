@@ -34,4 +34,6 @@
     <string name="icon_tabata">ico_run</string>
     <string name="icon_leger_test">ico_cone</string>
     <string name="action_add_run">Add a session</string>
+    <string name="title_activity_session_type">New session</string>
+    <string name="hello_world">Hello world!</string>
 </resources>

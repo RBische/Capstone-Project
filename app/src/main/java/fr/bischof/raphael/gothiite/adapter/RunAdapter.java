@@ -69,10 +69,6 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
         mEmptyView.setVisibility(itemCount == 0 ? View.VISIBLE : View.GONE);
     }
 
-    public Cursor getCursor() {
-        return mCursor;
-    }
-
     public interface RunAdapterOnClickHandler {
         void onClick(String runId, RunAdapterViewHolder vh);
     }

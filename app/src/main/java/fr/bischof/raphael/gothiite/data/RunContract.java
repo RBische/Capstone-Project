@@ -27,10 +27,11 @@ public class RunContract  {
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_RUN = "run";
-    public static final String PATH_RUN_WITH_RUN_TYPE = "run";
+    public static final String PATH_RUN_WITH_RUN_TYPE = "runwithruntype";
     public static final String PATH_RUN_INTERVAL = "runInterval";
     public static final String PATH_RUN_TYPE = "runtype";
     public static final String PATH_RUN_TYPE_INTERVAL = "runtypeInterval";
+    public static final String PATH_RUN_INTERVAL_WITH_RUN = "runIntervalwithrun";
 
 
     /* Inner class that defines the table contents of the run table */
@@ -53,8 +54,8 @@ public class RunContract  {
         public static final String COLUMN_START_DATE = "start_date";
         public static final String COLUMN_RUN_TYPE_ID = "runTypeId";
 
-        public static Uri buildRunUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildRunUri(String id) {
+            return Uri.parse(CONTENT_URI+"/"+id);
         }
 
         public static Uri buildRunsUri() {
@@ -70,6 +71,8 @@ public class RunContract  {
     public static final class RunIntervalEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN_INTERVAL).build();
+        public static final Uri CONTENT_JOINED_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN_INTERVAL_WITH_RUN).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN_INTERVAL;
@@ -93,8 +96,16 @@ public class RunContract  {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildRunIntervalsWithRunUri(String id) {
+            return Uri.parse(CONTENT_JOINED_URI + "/" + id);
+        }
+
         public static Uri buildRunIntervalsUri() {
             return CONTENT_URI;
+        }
+
+        public static String getRunIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -115,6 +126,7 @@ public class RunContract  {
         public static final String COLUMN_DISTANCE_GROWING = "distance_growing";
         public static final String COLUMN_CAN_BE_DELETED = "can_be_deleted";
         public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_ICON = "iconRun";
 
         public static Uri buildRunTypeUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

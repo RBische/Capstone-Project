@@ -194,6 +194,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         runTypeToSend.add("distanceGrowing", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING)) == 1);
                         runTypeToSend.add("canBeDeleted", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1);
                         runTypeToSend.add("description", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+                        runTypeToSend.add("icon", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON)));
                         runTypeToSend.add("userId", currentUser);
                         runTypeToSend.setObjectId(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)));
                         runTypesToSend.add(runTypeToSend);
@@ -209,6 +210,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION,serverObject.getString("description"));
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING,serverObject.getBoolean("distanceGrowing") ? 1 : 0);
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_NAME,serverObject.getString("name"));
+                        valuesToSave.put(RunContract.RunTypeEntry.COLUMN_ICON,serverObject.getString("icon"));
                         valuesToSave.put(RunContract.RunTypeEntry._ID,serverObject.getObjectId());
                         runTypesToSave.add(valuesToSave);
                     }
@@ -290,7 +292,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 //Preparing comparison by storing ids in a list
                 ArrayList<String> serverCurrentRunsId = new ArrayList<>();
                 ArrayList<String> localCurrentRunsId = new ArrayList<>();
-                ArrayList<String> serverCurrentRunsToRetrieveId = new ArrayList<>();
+                ArrayList<ParseObject> serverCurrentRunsToRetrieveId = new ArrayList<>();
                 for(ParseObject serverObject:runs){
                     serverCurrentRunsId.add(serverObject.getObjectId());
                 }
@@ -314,7 +316,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 runsData.close();
                 for(ParseObject serverObject:runs){
                     if (!localCurrentRunsId.contains(serverObject.getObjectId())){
-                        serverCurrentRunsToRetrieveId.add(serverObject.getObjectId());
+                        serverCurrentRunsToRetrieveId.add(serverObject);
                         ContentValues valuesToSave = new ContentValues();
                         valuesToSave.put(RunContract.RunEntry.COLUMN_AVG_SPEED,serverObject.getDouble("averageSpeed"));
                         valuesToSave.put(RunContract.RunEntry.COLUMN_RUN_TYPE_ID,serverObject.getParseObject("runTypeId").getObjectId());
@@ -334,7 +336,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void syncRunIntervals(ArrayList<String> serverCurrentRunsToRetrieveId, ArrayList<ParseObject> runsToSend) {
+    private void syncRunIntervals(ArrayList<ParseObject> serverCurrentRunsToRetrieveId, ArrayList<ParseObject> runsToSend) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("RunInterval");
         query.whereContainedIn("runId", serverCurrentRunsToRetrieveId);
         try {

@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -31,7 +30,6 @@ import fr.bischof.raphael.gothiite.data.RunContract;
  */
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,RunAdapter.RunAdapterOnClickHandler {
 
-    public static final String EXTRA_RUN_ID = "runId";
     private static final int RUNS_LOADER = 0;
     private static final String[] RUNS_PROJECTION = {RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry._ID,
             RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_RUN_TYPE_ID,
@@ -39,6 +37,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT,
             RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_AVG_SPEED,
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_NAME,
+            RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON,
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_DESCRIPTION};
     @InjectView(R.id.rvRuns) RecyclerView mRvRuns;
     private RunAdapter mRunAdapter;
@@ -103,7 +102,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onClick(String runId, RunAdapter.RunAdapterViewHolder vh) {
         Intent i = new Intent(getActivity(), DetailsActivity.class);
-        i.putExtra(EXTRA_RUN_ID,runId);
+        i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(runId));
         startActivity(i);
     }
 }

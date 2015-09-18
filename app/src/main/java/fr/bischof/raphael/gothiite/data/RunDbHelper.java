@@ -16,7 +16,7 @@ import fr.bischof.raphael.gothiite.R;
 public class RunDbHelper  extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 10;
     private Context mContext;
 
     static final String DATABASE_NAME = "run.db";
@@ -39,7 +39,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
                 RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
 
         final String SQL_CREATE_RUN_INTERVAL_TABLE = "CREATE TABLE " + RunContract.RunIntervalEntry.TABLE_NAME + " (" +
-                RunContract.RunIntervalEntry._ID + " INTEGER PRIMARY KEY," +
+                RunContract.RunIntervalEntry._ID + " TEXT PRIMARY KEY," +
 
                 RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE + " REAL NOT NULL, " +
                 RunContract.RunIntervalEntry.COLUMN_END_DATE + " INTEGER NOT NULL, " +
@@ -58,6 +58,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
                 RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED + " INTEGER NOT NULL, " +
                 RunContract.RunTypeEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING + " INTEGER NOT NULL, " +
+                RunContract.RunTypeEntry.COLUMN_ICON + " TEXT NOT NULL, " +
                 RunContract.RunTypeEntry.COLUMN_NAME + " TEXT NOT NULL " +
                 ");";
 
@@ -90,6 +91,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION, mContext.getString(R.string.leger_test_description));
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING, true);
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_NAME, mContext.getString(R.string.leger_test_name));
+        tabataRunType.put(RunContract.RunTypeEntry.COLUMN_ICON, mContext.getString(R.string.icon_leger_test));
         tabataRunType.put(RunContract.RunTypeEntry._ID, "IP3Asv0Lq4");
         sqLiteDatabase.insert(RunContract.RunTypeEntry.TABLE_NAME, null, tabataRunType);
         long[] timeToDo = new long[]{128500,135000,120000,126000,130800,120000,124600,128600,120000,123800,127100,120000,123100,126000,120000,122700,125200,120000,122400,124600};
@@ -114,6 +116,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION, mContext.getString(R.string.tabata_description));
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING, false);
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_NAME, mContext.getString(R.string.tabata));
+        tabataRunType.put(RunContract.RunTypeEntry.COLUMN_ICON, mContext.getString(R.string.icon_tabata));
         tabataRunType.put(RunContract.RunTypeEntry._ID, "NzJfaCp6iY");
         sqLiteDatabase.insert(RunContract.RunTypeEntry.TABLE_NAME, null, tabataRunType);
         for(int i =0;i<15;i++){

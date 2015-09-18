@@ -42,23 +42,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-        <!-- empty list -->
-        <TextView
-            android:id="@+id/tvRvRunsEmpty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_anchor="@+id/rvRuns"
-            app:layout_anchorGravity="fill"
-            android:gravity="center_horizontal"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:text="@string/empty_run_list" />
 
     </android.support.design.widget.CoordinatorLayout>
+    <!-- empty list -->
+    <TextView
+        android:id="@+id/tvRvRunsEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_anchor="@+id/rvRuns"
+        app:layout_anchorGravity="fill"
+        android:gravity="center_horizontal"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/appbar_height"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:text="@string/empty_run_list"/>
+
     <!-- view for AdMob Banner Ad -->
     <com.google.android.gms.ads.AdView android:id="@+id/adView" android:layout_width="wrap_content"
         android:layout_height="wrap_content"

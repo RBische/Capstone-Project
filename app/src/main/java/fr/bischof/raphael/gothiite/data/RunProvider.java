@@ -19,6 +19,7 @@ public class RunProvider extends ContentProvider {
     public static final int RUNS_WITH_RUN_TYPE = 120;
     public static final int RUN_INTERVALS = 200;
     public static final int RUN_INTERVAL = 201;
+    public static final int RUN_INTERVALS_WITH_RUN = 220;
     public static final int RUN_TYPES = 300;
     public static final int RUN_TYPE = 301;
     public static final int RUN_TYPE_INTERVALS = 400;
@@ -29,9 +30,15 @@ public class RunProvider extends ContentProvider {
     private RunDbHelper mOpenHelper;
     private static final SQLiteQueryBuilder sRunsQueryBuilder;
     private static final SQLiteQueryBuilder sRunIntervalsQueryBuilder;
+    private static final SQLiteQueryBuilder sRunIntervalsWithRunQueryBuilder;
     private static final SQLiteQueryBuilder sRunTypesQueryBuilder;
     private static final SQLiteQueryBuilder sRunTypeIntervalsQueryBuilder;
     private static final SQLiteQueryBuilder sRunsWithRunTypeQueryBuilder;
+
+
+    private static final String sRunIntervalWithRunSelection =
+            RunContract.RunEntry.TABLE_NAME+
+                    "." + RunContract.RunEntry._ID + " = ?";
 
     static{
         sRunsQueryBuilder = new SQLiteQueryBuilder();
@@ -48,6 +55,19 @@ public class RunProvider extends ContentProvider {
         sRunIntervalsQueryBuilder = new SQLiteQueryBuilder();
         sRunIntervalsQueryBuilder.setTables(
                 RunContract.RunIntervalEntry.TABLE_NAME );
+        sRunIntervalsWithRunQueryBuilder = new SQLiteQueryBuilder();
+        sRunIntervalsWithRunQueryBuilder.setTables(
+                RunContract.RunEntry.TABLE_NAME+ " INNER JOIN " +
+                        RunContract.RunTypeEntry.TABLE_NAME +
+                        " ON " + RunContract.RunTypeEntry.TABLE_NAME +
+                        "." + RunContract.RunTypeEntry._ID +
+                        " = " + RunContract.RunEntry.TABLE_NAME +
+                        "." + RunContract.RunEntry.COLUMN_RUN_TYPE_ID+ " INNER JOIN " +
+                        RunContract.RunIntervalEntry.TABLE_NAME +
+                        " ON " + RunContract.RunIntervalEntry.TABLE_NAME +
+                        "." + RunContract.RunIntervalEntry.COLUMN_RUN_ID +
+                        " = " + RunContract.RunEntry.TABLE_NAME +
+                        "." + RunContract.RunEntry._ID );
         sRunTypesQueryBuilder = new SQLiteQueryBuilder();
         sRunTypesQueryBuilder.setTables(
                 RunContract.RunTypeEntry.TABLE_NAME );
@@ -69,6 +89,7 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN + "/*", RUN);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL , RUN_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL + "/*", RUN_INTERVAL);
+        matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL_WITH_RUN + "/*", RUN_INTERVALS_WITH_RUN);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE, RUN_TYPES);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL, RUN_TYPE_INTERVALS);
@@ -105,6 +126,11 @@ public class RunProvider extends ContentProvider {
             case RUN_INTERVALS:
             {
                 retCursor = getRunIntervals(projection, sortOrder);
+                break;
+            }
+            case RUN_INTERVALS_WITH_RUN:
+            {
+                retCursor = getRunIntervalsWithRun(uri, projection, sortOrder);
                 break;
             }
             case RUN_TYPE_INTERVALS:
@@ -154,6 +180,18 @@ public class RunProvider extends ContentProvider {
         );
     }
 
+    private Cursor getRunIntervalsWithRun(Uri uri, String[] projection, String sortOrder) {
+        String runId = RunContract.RunIntervalEntry.getRunIdFromUri(uri);
+        return sRunIntervalsWithRunQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sRunIntervalWithRunSelection,
+                new String[]{runId},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
         return sRunsWithRunTypeQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -191,6 +229,8 @@ public class RunProvider extends ContentProvider {
                 return RunContract.RunIntervalEntry.CONTENT_TYPE;
             case RUN_INTERVAL:
                 return RunContract.RunIntervalEntry.CONTENT_ITEM_TYPE;
+            case RUN_INTERVALS_WITH_RUN:
+                return RunContract.RunIntervalEntry.CONTENT_TYPE;
             case RUN_TYPES:
                 return RunContract.RunTypeEntry.CONTENT_TYPE;
             case RUN_TYPE:
@@ -212,11 +252,8 @@ public class RunProvider extends ContentProvider {
 
         switch (match) {
             case RUN: {
-                long _id = db.insert(RunContract.RunEntry.TABLE_NAME, null, contentValues);
-                if ( _id > 0 )
-                    returnUri = RunContract.RunEntry.buildRunUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                db.insert(RunContract.RunEntry.TABLE_NAME, null, contentValues);
+                returnUri = RunContract.RunEntry.buildRunUri(contentValues.get(RunContract.RunEntry._ID).toString());
                 break;
             }
             case RUN_INTERVAL: {
@@ -272,6 +309,7 @@ public class RunProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunEntry.buildRunsWithRunTypeUri(), null);
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
                 return returnCount;

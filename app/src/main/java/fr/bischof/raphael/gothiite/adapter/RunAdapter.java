@@ -53,8 +53,7 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
         runAdapterViewHolder.mTvTitle.setText(new DateToShowFormat().format(runDate.getTime()));
         runAdapterViewHolder.mTvSubtitle.setText(""+mCursor.getLong(mCursor.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT))+" "+mContext.getString(R.string.kmh_vvo2max));
         runAdapterViewHolder.mTvOtherDetail.setText(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
-        //TODO: Add icon to Database so that it can be changed for each RunTypes
-        runAdapterViewHolder.mIvRun.setImageResource(R.drawable.ico_run);
+        runAdapterViewHolder.mIvRun.setImageResource(mContext.getResources().getIdentifier(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON)), "drawable", mContext.getPackageName()));
     }
 
     @Override
@@ -66,7 +65,8 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
     public void swapCursor(Cursor data) {
         mCursor = data;
         notifyDataSetChanged();
-        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        int itemCount = getItemCount();
+        mEmptyView.setVisibility(itemCount == 0 ? View.VISIBLE : View.GONE);
     }
 
     public Cursor getCursor() {

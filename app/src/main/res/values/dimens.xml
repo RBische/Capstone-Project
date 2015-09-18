@@ -12,4 +12,5 @@
     <!-- Icon Sizes -->
     <dimen name="detail_icon">96dp</dimen>
     <dimen name="list_icon">40dp</dimen>
+    <dimen name="appbar_height">120dp</dimen>
 </resources>

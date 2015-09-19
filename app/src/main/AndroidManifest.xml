@@ -93,6 +93,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.bischof.raphael.gothiite.activity.MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.CreateSessionTypeActivity"
+            android:label="@string/title_activity_create_session_type"
+            android:parentActivityName=".activity.SessionTypeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.bischof.raphael.gothiite.activity.SessionTypeActivity" />
+        </activity>
     </application>
 
 </manifest>

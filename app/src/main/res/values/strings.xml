@@ -36,4 +36,8 @@
     <string name="action_add_run">Add a session</string>
     <string name="title_activity_session_type">New session</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_create_session">New session type</string>
+    <string name="title_activity_create_session_type">New session type</string>
+    <string name="name_hint">Name</string>
+    <string name="description_hint">Description (Optional)</string>
 </resources>

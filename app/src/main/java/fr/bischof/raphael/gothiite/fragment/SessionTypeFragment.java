@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.activity.CreateSessionTypeActivity;
 import fr.bischof.raphael.gothiite.activity.DetailsActivity;
 import fr.bischof.raphael.gothiite.activity.SessionTypeActivity;
 import fr.bischof.raphael.gothiite.adapter.RunAdapter;
@@ -54,7 +55,7 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
         v.findViewById(R.id.fabAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), SessionTypeActivity.class);
+                Intent i = new Intent(getActivity(), CreateSessionTypeActivity.class);
                 startActivity(i);
             }
         });

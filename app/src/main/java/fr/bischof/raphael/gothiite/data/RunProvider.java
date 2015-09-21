@@ -93,7 +93,7 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE, RUN_TYPES);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL, RUN_TYPE_INTERVALS);
-        matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVAL);
+        matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVALS);
         return matcher;
     }
 
@@ -273,11 +273,8 @@ public class RunProvider extends ContentProvider {
                 break;
             }
             case RUN_TYPE_INTERVAL: {
-                long _id = db.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, contentValues);
-                if ( _id > 0 )
-                    returnUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                db.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, contentValues);
+                returnUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
                 break;
             }
             default:

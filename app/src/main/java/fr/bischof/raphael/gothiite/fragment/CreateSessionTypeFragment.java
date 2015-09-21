@@ -1,9 +1,13 @@
 package fr.bischof.raphael.gothiite.fragment;
 
-import android.graphics.drawable.NinePatchDrawable;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,31 +16,34 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
-import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.UUID;
 
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.adapter.RunIntervalAdapter;
+import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CreateSessionTypeFragment extends Fragment {
+public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = "SessionTypeCreation";
+    private static final int RUN_TYPE_LOADER = 1;
+    private static final java.lang.String SAVED_PARSE_ID = "parseId";
+    private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
+            RunContract.RunTypeIntervalEntry.COLUMN_EFFORT};
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
+    private String mParseID;
+    private Uri mUri;
 
     public CreateSessionTypeFragment() {
     }
@@ -55,23 +62,21 @@ public class CreateSessionTypeFragment extends Fragment {
                 actionBar.setDisplayShowHomeEnabled(true);
             }
         }
-        ArrayList<HashMap<String,String>> values = new ArrayList<>();
-        HashMap<String,String> test2 = new HashMap<>();
-        test2.put("test","data1");
-        values.add(test2);
-        HashMap<String,String> test3 = new HashMap<>();
-        test3.put("test", "dattaaa2");
-        values.add(test3);
-        HashMap<String,String> test4 = new HashMap<>();
-        test4.put("test", "dattaaa3");
-        values.add(test4);
-        HashMap<String,String> test5 = new HashMap<>();
-        test5.put("test", "dattaaa4");
-        values.add(test5);
-        HashMap<String,String> test = new HashMap<>();
-        test.put("test", "dattaaa5");
-        values.add(test);
+        if (savedInstanceState!=null){
+            String textualParseId = savedInstanceState.getString(SAVED_PARSE_ID);
+            if (textualParseId!=null){
+                mParseID = textualParseId;
+            }
+        }else{
+            mParseID = UUID.randomUUID().toString();
+        }
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVED_PARSE_ID, mParseID);
     }
 
     @Override
@@ -108,6 +113,8 @@ public class CreateSessionTypeFragment extends Fragment {
         //mRecyclerView.addItemDecoration(new SimpleListDividerDecorator(getResources().getDrawable(R.drawable.list_divider), true));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
+        mUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
+        getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
     }
 
     @Override
@@ -141,6 +148,28 @@ public class CreateSessionTypeFragment extends Fragment {
 
     private boolean supportsViewElevation() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String sortOrder = RunContract.RunTypeIntervalEntry.TABLE_NAME+"."+RunContract.RunTypeIntervalEntry.COLUMN_ORDER + " ASC";
+
+        return new CursorLoader(getActivity(),
+                mUri,
+                RUN_TYPE_INTERVALS_PROJECTION,
+                RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + "= ?",
+                new String[]{mParseID},
+                sortOrder);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
     }
 
 }

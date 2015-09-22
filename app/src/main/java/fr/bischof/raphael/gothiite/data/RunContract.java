@@ -128,12 +128,16 @@ public class RunContract  {
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_ICON = "iconRun";
 
-        public static Uri buildRunTypeUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildRunTypeUri(String id) {
+            return Uri.parse(CONTENT_URI+"/"+ id);
         }
 
         public static Uri buildRunTypesUri() {
             return CONTENT_URI;
+        }
+
+        public static String getRunTypeIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 

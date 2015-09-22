@@ -265,11 +265,8 @@ public class RunProvider extends ContentProvider {
                 break;
             }
             case RUN_TYPE: {
-                long _id = db.insert(RunContract.RunTypeEntry.TABLE_NAME, null, contentValues);
-                if ( _id > 0 )
-                    returnUri = RunContract.RunTypeEntry.buildRunTypeUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                db.insert(RunContract.RunTypeEntry.TABLE_NAME, null, contentValues);
+                returnUri = RunContract.RunTypeEntry.buildRunTypeUri(contentValues.getAsString(RunContract.RunTypeEntry._ID));
                 break;
             }
             case RUN_TYPE_INTERVAL: {
@@ -376,6 +373,22 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case RUN_TYPE: {
+                String whereClause = RunContract.RunTypeEntry._ID+"=?";
+                String[] whereArgs = new String[]{RunContract.RunTypeEntry.getRunTypeIdFromUri(uri)};
+                db.update(RunContract.RunTypeEntry.TABLE_NAME, contentValues, whereClause,whereArgs);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (getContext()!=null&&getContext().getContentResolver()!=null){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return 0;
     }
 }

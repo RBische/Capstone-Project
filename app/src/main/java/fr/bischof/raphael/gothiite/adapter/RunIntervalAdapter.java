@@ -1,5 +1,8 @@
 package fr.bischof.raphael.gothiite.adapter;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.internal.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
@@ -17,17 +20,21 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
  * Adapter that displays item of RunIntervalType
  * Created by biche on 19/09/2015.
  */
-public class RunIntervalAdapter      extends RecyclerView.Adapter<RunIntervalAdapter.MyViewHolder>
+public class RunIntervalAdapter extends RecyclerView.Adapter<RunIntervalAdapter.MyViewHolder>
         implements DraggableItemAdapter<RunIntervalAdapter.MyViewHolder> {
     private static final String TAG = "MyDraggableItemAdapter";
-    private String[] datas = new String[]{
-      "1eee","e222eee2e","3eqs3t"
-    };
+    private final Context mContext;
+    private Cursor mCursor;
+
+    public void swapCursor(Cursor data) {
+
+    }
 
     public static class MyViewHolder extends AbstractDraggableItemViewHolder {
         public LinearLayout mContainer;
@@ -42,8 +49,8 @@ public class RunIntervalAdapter      extends RecyclerView.Adapter<RunIntervalAda
         }
     }
 
-    public RunIntervalAdapter() {
-
+    public RunIntervalAdapter(Context context) {
+        mContext = context;
         // DraggableItemAdapter requires stable ID, and also
         // have to implement the getItemId() method appropriately.
         setHasStableIds(true);
@@ -51,7 +58,8 @@ public class RunIntervalAdapter      extends RecyclerView.Adapter<RunIntervalAda
 
     @Override
     public long getItemId(int position) {
-        return datas[position].hashCode();
+        mCursor.moveToPosition(position);
+        return mCursor.getString(mCursor.getColumnIndex(RunContract.RunIntervalEntry._ID)).hashCode();
     }
 
     @Override
@@ -63,35 +71,16 @@ public class RunIntervalAdapter      extends RecyclerView.Adapter<RunIntervalAda
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final String item = datas[position];
-
-        // set text
-        holder.mTextView.setText(item);
-
-        // set background resource (target view ID: container)
-        final int dragState = holder.getDragStateFlags();
-
-        /*if (((dragState & RecyclerViewDragDropManager.STATE_FLAG_IS_UPDATED) != 0)) {
-            int bgResId;
-
-            if ((dragState & RecyclerViewDragDropManager.STATE_FLAG_IS_ACTIVE) != 0) {
-                bgResId = R.drawable.bg_item_dragging_active_state;
-
-                // need to clear drawable state here to get correct appearance of the dragging item.
-                DrawableUtils.clearState(holder.mContainer.getForeground());
-            } else if ((dragState & RecyclerViewDragDropManager.STATE_FLAG_DRAGGING) != 0) {
-                bgResId = R.drawable.bg_item_dragging_state;
-            } else {
-                bgResId = R.drawable.bg_item_normal_state;
-            }
-
-            holder.mContainer.setBackgroundResource(bgResId);
-        }*/
+        mCursor.moveToPosition(position);
+        boolean effort = mCursor.getInt(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
+        long time = mCursor.getLong(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
+        holder.mTextView.setText(""+(time/1000)+mContext.getString(effort ? R.string.second_effort : R.string.txt_rest));
     }
 
     @Override
     public int getItemCount() {
-        return datas.length;
+        if ( null == mCursor ) return 0;
+        return mCursor.getCount();
     }
 
     @Override
@@ -102,9 +91,9 @@ public class RunIntervalAdapter      extends RecyclerView.Adapter<RunIntervalAda
             return;
         }
 
-        String save  = datas[toPosition];
-        datas[toPosition] = datas[fromPosition];
-        datas[fromPosition] = save;
+        //String save  = datas[toPosition];
+        //datas[toPosition] = datas[fromPosition];
+        //datas[fromPosition] = save;
 
         notifyItemMoved(fromPosition, toPosition);
     }

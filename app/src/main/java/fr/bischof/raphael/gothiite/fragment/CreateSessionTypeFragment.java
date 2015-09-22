@@ -1,5 +1,7 @@
 package fr.bischof.raphael.gothiite.fragment;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -13,9 +15,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
@@ -24,6 +29,8 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
 import java.util.UUID;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.adapter.RunIntervalAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
@@ -31,19 +38,25 @@ import fr.bischof.raphael.gothiite.data.RunContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher {
     private static final String TAG = "SessionTypeCreation";
     private static final int RUN_TYPE_LOADER = 1;
     private static final java.lang.String SAVED_PARSE_ID = "parseId";
+    private static final java.lang.String SAVED_EVER_INSERTED = "everInserted";
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT};
+    @InjectView(R.id.etName)
+    EditText etName;
+    @InjectView(R.id.etDescription)
+    EditText etDescription;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter mAdapter;
+    private RunIntervalAdapter mAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
-    private String mParseID;
+    private String mRunTypeID;
     private Uri mUri;
+    private boolean mEverInserted = false;
 
     public CreateSessionTypeFragment() {
     }
@@ -52,6 +65,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_create_session_type, container, false);
+        ButterKnife.inject(this, v);
         if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
             Toolbar toolbar = (Toolbar)v.findViewById(R.id.toolbar);
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -63,12 +77,13 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             }
         }
         if (savedInstanceState!=null){
+            mEverInserted = savedInstanceState.getBoolean(SAVED_EVER_INSERTED,false);
             String textualParseId = savedInstanceState.getString(SAVED_PARSE_ID);
             if (textualParseId!=null){
-                mParseID = textualParseId;
+                mRunTypeID = textualParseId;
             }
         }else{
-            mParseID = UUID.randomUUID().toString();
+            mRunTypeID = UUID.randomUUID().toString();
         }
         return v;
     }
@@ -76,12 +91,16 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(SAVED_PARSE_ID, mParseID);
+        outState.putString(SAVED_PARSE_ID, mRunTypeID);
+        outState.putBoolean(SAVED_EVER_INSERTED, mEverInserted);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        etName.addTextChangedListener(this);
+        etDescription.addTextChangedListener(this);
 
         //noinspection ConstantConditions
         mRecyclerView = (RecyclerView) getView().findViewById(R.id.rvIntervals);
@@ -91,16 +110,9 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         mRecyclerViewDragDropManager = new RecyclerViewDragDropManager();
         //mRecyclerViewDragDropManager.setDraggingItemShadowDrawable(getResources().getDrawable(R.drawable.ic_mover));
 
-        //adapter
-        final RunIntervalAdapter myItemAdapter = new RunIntervalAdapter();
-        mAdapter = myItemAdapter;
-
-        mWrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(myItemAdapter);      // wrap for dragging
-
+        mAdapter = new RunIntervalAdapter(getActivity());
+        setAdapter();
         final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mWrappedAdapter);  // requires *wrapped* adapter
         mRecyclerView.setItemAnimator(animator);
 
         // additional decorations
@@ -115,6 +127,12 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
         mUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
         getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
+    }
+
+    private void setAdapter() {
+        mWrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mWrappedAdapter);
     }
 
     @Override
@@ -158,8 +176,13 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
                 mUri,
                 RUN_TYPE_INTERVALS_PROJECTION,
                 RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + "= ?",
-                new String[]{mParseID},
+                new String[]{mRunTypeID},
                 sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
     }
 
     @Override
@@ -168,8 +191,35 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
     }
 
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        saveRunType();
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
+
+    private void saveRunType(){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(RunContract.RunTypeEntry._ID,mRunTypeID);
+        //TODO: Make an icon picker
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_ICON,"ico_run");
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_NAME,etName.getText().toString());
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING,false);
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION,etDescription.getText().toString());
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,true);
+        ContentResolver contentResolver = getContext().getContentResolver();
+        if (mEverInserted){
+            contentResolver.update(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),contentValues,null,null);
+        }else{
+            contentResolver.insert(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),contentValues);
+            mEverInserted = true;
+        }
+    }
 }

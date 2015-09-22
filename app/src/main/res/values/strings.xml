@@ -40,4 +40,6 @@
     <string name="title_activity_create_session_type">New session type</string>
     <string name="name_hint">Name</string>
     <string name="description_hint">Description (Optional)</string>
+    <string name="second_effort">s effort</string>
+    <string name="txt_rest">s rest</string>
 </resources>

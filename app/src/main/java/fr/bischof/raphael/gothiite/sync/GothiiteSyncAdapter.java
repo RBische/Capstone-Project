@@ -189,6 +189,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                     localCurrentRunTypesId.add(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)));
                     if (!serverCurrentRunTypesId.contains(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)))
                             &&runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1){
+                        //TODO: Make that if they are added, the new ID is fetched and save in DB
                         ParseObject runTypeToSend = new ParseObject("RunType");
                         runTypeToSend.add("name", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
                         runTypeToSend.add("distanceGrowing", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING)) == 1);
@@ -254,7 +255,8 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             if (runTypeIntervalsData!=null) {
                 runTypeIntervalsData.moveToFirst();
                 while (!runTypeIntervalsData.isAfterLast()){
-                    ParseObject runIntervalToSend = new ParseObject("RunInterval");
+                    //TODO: Make that if they are added, the new ID is fetched and save in DB
+                    ParseObject runIntervalToSend = new ParseObject("RunTypeInterval");
                     runIntervalToSend.add("distanceToDo", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO)));
                     runIntervalToSend.add("effort", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1);
                     runIntervalToSend.add("order", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_ORDER)));
@@ -300,6 +302,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 while (!runsData.isAfterLast()){
                     localCurrentRunsId.add(runsData.getString(runsData.getColumnIndex(RunContract.RunEntry._ID)));
                     if (!serverCurrentRunsId.contains(runsData.getString(runsData.getColumnIndex(RunContract.RunEntry._ID)))){
+                        //TODO: Make that if they are added, the new ID is fetched and save in DB
                         Calendar runDate = Calendar.getInstance();
                         runDate.setTimeInMillis(runsData.getLong(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_START_DATE)));
                         ParseObject runToSend = new ParseObject("Run");
@@ -368,6 +371,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             if (runIntervalsData!=null) {
                 runIntervalsData.moveToFirst();
                 while (!runIntervalsData.isAfterLast()){
+                    //TODO: Make that if they are added, the new ID is fetched and save in DB
                     Calendar runIntervalStartDate = Calendar.getInstance();
                     runIntervalStartDate.setTimeInMillis(runIntervalsData.getLong(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_DATE)));
                     Calendar runIntervalEndDate = Calendar.getInstance();

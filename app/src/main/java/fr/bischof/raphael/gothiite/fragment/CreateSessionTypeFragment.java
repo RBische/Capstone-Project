@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -66,6 +67,12 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_create_session_type, container, false);
         ButterKnife.inject(this, v);
+        v.findViewById(R.id.fabAdd).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addItem();
+            }
+        });
         if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
             Toolbar toolbar = (Toolbar)v.findViewById(R.id.toolbar);
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -86,6 +93,11 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             mRunTypeID = UUID.randomUUID().toString();
         }
         return v;
+    }
+
+    private void addItem() {
+        DialogFragment newFragment = new CreateSessionTypeIntervalFragment();
+        newFragment.show(getActivity().getSupportFragmentManager(), "runtypeinterval");
     }
 
     @Override

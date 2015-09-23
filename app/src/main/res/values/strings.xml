@@ -42,4 +42,9 @@
     <string name="description_hint">Description (Optional)</string>
     <string name="second_effort">s effort</string>
     <string name="txt_rest">s rest</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="run_type_interval_add">Add an interval</string>
+    <string name="time_to_do">Time to run</string>
+    <string name="distance_to_run">Distance to run (Optional)</string>
 </resources>

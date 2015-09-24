@@ -45,6 +45,9 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="run_type_interval_add">Add an interval</string>
-    <string name="time_to_do">Time to run</string>
-    <string name="distance_to_run">Distance to run (Optional)</string>
+    <string name="time_to_do">Time to run (Seconds)</string>
+    <string name="distance_to_run">Distance to run (Meters, Optional)</string>
+    <string name="is_an_effort">Is an effort</string>
+    <string name="default_run_type_name">New Run Type</string>
+    <string name="time_to_do_required">A time to run is required</string>
 </resources>

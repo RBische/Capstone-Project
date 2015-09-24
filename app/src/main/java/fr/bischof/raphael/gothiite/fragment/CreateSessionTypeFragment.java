@@ -40,12 +40,12 @@ import fr.bischof.raphael.gothiite.data.RunContract;
  * A placeholder fragment containing a simple view.
  */
 public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher {
-    private static final String TAG = "SessionTypeCreation";
     private static final int RUN_TYPE_LOADER = 1;
     private static final java.lang.String SAVED_PARSE_ID = "parseId";
     private static final java.lang.String SAVED_EVER_INSERTED = "everInserted";
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
-            RunContract.RunTypeIntervalEntry.COLUMN_EFFORT};
+            RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
+            RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO};
     @InjectView(R.id.etName)
     EditText etName;
     @InjectView(R.id.etDescription)
@@ -96,7 +96,8 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     }
 
     private void addItem() {
-        DialogFragment newFragment = new CreateSessionTypeIntervalFragment();
+        saveRunType();
+        DialogFragment newFragment = CreateSessionTypeIntervalFragment.newInstance(mRunTypeID,mAdapter.getItemCount());
         newFragment.show(getActivity().getSupportFragmentManager(), "runtypeinterval");
     }
 
@@ -222,15 +223,19 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         contentValues.put(RunContract.RunTypeEntry._ID,mRunTypeID);
         //TODO: Make an icon picker
         contentValues.put(RunContract.RunTypeEntry.COLUMN_ICON,"ico_run");
-        contentValues.put(RunContract.RunTypeEntry.COLUMN_NAME,etName.getText().toString());
+        if (!etName.getText().toString().equals("")){
+            contentValues.put(RunContract.RunTypeEntry.COLUMN_NAME,etName.getText().toString());
+        }else{
+            contentValues.put(RunContract.RunTypeEntry.COLUMN_NAME,getString(R.string.default_run_type_name));
+        }
         contentValues.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING,false);
         contentValues.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION,etDescription.getText().toString());
         contentValues.put(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,true);
         ContentResolver contentResolver = getContext().getContentResolver();
         if (mEverInserted){
-            contentResolver.update(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),contentValues,null,null);
+            contentResolver.update(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID), contentValues, null, null);
         }else{
-            contentResolver.insert(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),contentValues);
+            contentResolver.insert(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID), contentValues);
             mEverInserted = true;
         }
     }

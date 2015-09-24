@@ -269,7 +269,7 @@ public class RunProvider extends ContentProvider {
                 returnUri = RunContract.RunTypeEntry.buildRunTypeUri(contentValues.getAsString(RunContract.RunTypeEntry._ID));
                 break;
             }
-            case RUN_TYPE_INTERVAL: {
+            case RUN_TYPE_INTERVALS: {
                 db.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, contentValues);
                 returnUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
                 break;

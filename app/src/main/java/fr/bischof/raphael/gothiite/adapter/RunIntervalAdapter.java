@@ -33,7 +33,8 @@ public class RunIntervalAdapter extends RecyclerView.Adapter<RunIntervalAdapter.
     private Cursor mCursor;
 
     public void swapCursor(Cursor data) {
-
+        mCursor = data;
+        notifyDataSetChanged();
     }
 
     public static class MyViewHolder extends AbstractDraggableItemViewHolder {
@@ -90,11 +91,6 @@ public class RunIntervalAdapter extends RecyclerView.Adapter<RunIntervalAdapter.
         if (fromPosition == toPosition) {
             return;
         }
-
-        //String save  = datas[toPosition];
-        //datas[toPosition] = datas[fromPosition];
-        //datas[fromPosition] = save;
-
         notifyItemMoved(fromPosition, toPosition);
     }
 

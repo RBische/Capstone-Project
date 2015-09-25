@@ -93,7 +93,7 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE, RUN_TYPES);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL, RUN_TYPE_INTERVALS);
-        matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVALS);
+        matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVAL);
         return matcher;
     }
 
@@ -368,7 +368,28 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+        switch (match) {
+            case RUN_TYPE_INTERVAL: {
+                String selection = RunContract.RunTypeIntervalEntry._ID +"=?";
+                String[] selectionArgs = new String[]{RunContract.RunTypeIntervalEntry.getRunTypeIntervalIdFromUri(uri)};
+                rowsDeleted = db.delete(
+                        RunContract.RunTypeIntervalEntry.TABLE_NAME, selection, selectionArgs);
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
+                }
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        // Because a null deletes all rows
+        if (rowsDeleted != 0&& getContext()!=null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     @Override

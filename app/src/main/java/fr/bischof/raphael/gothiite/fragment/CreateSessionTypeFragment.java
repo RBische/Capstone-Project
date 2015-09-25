@@ -2,6 +2,7 @@ package fr.bischof.raphael.gothiite.fragment;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,13 +35,13 @@ import java.util.UUID;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
-import fr.bischof.raphael.gothiite.adapter.RunIntervalAdapter;
+import fr.bischof.raphael.gothiite.adapter.RunTypeIntervalAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher {
+public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, RunTypeIntervalAdapter.OnItemClickDeleteListener {
     private static final int RUN_TYPE_LOADER = 1;
     private static final java.lang.String SAVED_PARSE_ID = "parseId";
     private static final java.lang.String SAVED_EVER_INSERTED = "everInserted";
@@ -52,7 +54,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     EditText etDescription;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RunIntervalAdapter mAdapter;
+    private RunTypeIntervalAdapter mAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
     private String mRunTypeID;
@@ -123,7 +125,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         mRecyclerViewDragDropManager = new RecyclerViewDragDropManager();
         //mRecyclerViewDragDropManager.setDraggingItemShadowDrawable(getResources().getDrawable(R.drawable.ic_mover));
 
-        mAdapter = new RunIntervalAdapter(getActivity());
+        mAdapter = new RunTypeIntervalAdapter(getActivity(),this);
         setAdapter();
         final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
         mRecyclerView.setItemAnimator(animator);
@@ -238,5 +240,21 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             contentResolver.insert(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID), contentValues);
             mEverInserted = true;
         }
+    }
+
+    @Override
+    public void onClick(final String id, RunTypeIntervalAdapter.RunTypeIntervalViewHolder vh) {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle(getString(R.string.confirm)).setMessage(getString(R.string.sure_delete_interval)).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                ContentResolver contentResolver = getContext().getContentResolver();
+                contentResolver.delete(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(id),null,null);
+            }
+        }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        }).create();
+        dialog.show();
     }
 }

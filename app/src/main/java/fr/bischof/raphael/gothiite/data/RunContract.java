@@ -161,12 +161,16 @@ public class RunContract  {
         public static final String COLUMN_EFFORT = "effort";
         public static final String COLUMN_RUN_TYPE_ID = "run_type_id";
 
-        public static Uri buildRunTypeIntervalUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildRunTypeIntervalUri(String id) {
+            return Uri.parse(CONTENT_URI+"/"+ id);
         }
 
         public static Uri buildRunTypeIntervalsUri() {
             return CONTENT_URI;
+        }
+
+        public static String getRunTypeIntervalIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 }

@@ -404,6 +404,15 @@ public class RunProvider extends ContentProvider {
                 db.update(RunContract.RunTypeEntry.TABLE_NAME, contentValues, whereClause,whereArgs);
                 break;
             }
+            case RUN_TYPE_INTERVAL: {
+                String whereClause = RunContract.RunTypeIntervalEntry._ID+"=?";
+                String[] whereArgs = new String[]{RunContract.RunTypeIntervalEntry.getRunTypeIntervalIdFromUri(uri)};
+                db.update(RunContract.RunTypeIntervalEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                if(getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
+                }
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

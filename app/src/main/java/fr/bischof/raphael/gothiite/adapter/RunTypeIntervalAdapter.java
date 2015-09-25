@@ -1,7 +1,9 @@
 package fr.bischof.raphael.gothiite.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -103,30 +105,35 @@ public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeInterval
         if (fromPosition == toPosition) {
             return;
         }
+        mCursor.moveToPosition(fromPosition);
+        String runTypeInvervalIdFrom = mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry._ID));
+        Uri fromUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(runTypeInvervalIdFrom);
+        ContentValues valuesFrom = new ContentValues();
+        valuesFrom.put(RunContract.RunTypeIntervalEntry.COLUMN_ORDER,toPosition);
+        if (fromPosition<toPosition){
+            for(int i = 1;i<=toPosition-fromPosition;i++){
+                mCursor.moveToPosition(fromPosition+i);
+                Uri itemToMoveBetween  = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry._ID)));
+                ContentValues valuesItemToMoveBetween = new ContentValues();
+                valuesItemToMoveBetween.put(RunContract.RunTypeIntervalEntry.COLUMN_ORDER,fromPosition+i-1);
+                mContext.getContentResolver().update(itemToMoveBetween, valuesItemToMoveBetween, null, null);
+            }
+        }else{
+            for(int i = 1;i<=fromPosition-toPosition;i++){
+                mCursor.moveToPosition(fromPosition-i);
+                Uri itemToMoveBetween  = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry._ID)));
+                ContentValues valuesItemToMoveBetween = new ContentValues();
+                valuesItemToMoveBetween.put(RunContract.RunTypeIntervalEntry.COLUMN_ORDER,fromPosition-i+1);
+                mContext.getContentResolver().update(itemToMoveBetween, valuesItemToMoveBetween, null, null);
+            }
+        }
+        mContext.getContentResolver().update(fromUri, valuesFrom, null, null);
         notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public boolean onCheckCanStartDrag(RunTypeIntervalViewHolder holder, int position, int x, int y) {
-        // x, y --- relative from the itemView's top-left
-        final View containerView = holder.mContainer;
-        final View dragHandleView = holder.mDragHandle;
-
-        final int offsetX = containerView.getLeft() + (int) (ViewCompat.getTranslationX(containerView) + 0.5f);
-        final int offsetY = containerView.getTop() + (int) (ViewCompat.getTranslationY(containerView) + 0.5f);
-
-        return hitTest(dragHandleView, x - offsetX, y - offsetY);
-    }
-
-    public static boolean hitTest(View v, int x, int y) {
-        final int tx = (int) (ViewCompat.getTranslationX(v) + 0.5f);
-        final int ty = (int) (ViewCompat.getTranslationY(v) + 0.5f);
-        final int left = v.getLeft() + tx;
-        final int right = v.getRight() + tx;
-        final int top = v.getTop() + ty;
-        final int bottom = v.getBottom() + ty;
-
-        return (x >= left) && (x <= right) && (y >= top) && (y <= bottom);
+        return true;
     }
 
     @Override

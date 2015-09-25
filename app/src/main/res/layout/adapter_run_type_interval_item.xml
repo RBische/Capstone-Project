@@ -17,10 +17,12 @@
     <TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_toRightOf="@+id/handler"
         android:layout_toEndOf="@+id/handler"
-        android:layout_gravity="center_vertical"
+        android:layout_toLeftOf="@+id/ivDelete"
+        android:layout_toStartOf="@+id/ivDelete"
+        android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceLarge"
         tools:text="13 km/h"/>
 
@@ -32,5 +34,6 @@
         android:layout_alignParentRight="true"
         android:padding="@dimen/icon_padding"
         android:id="@+id/ivDelete"
+        android:contentDescription="@string/delete"
         />
 </RelativeLayout>

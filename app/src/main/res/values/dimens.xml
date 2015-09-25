@@ -8,7 +8,7 @@
     <dimen name="ic_max_height">150dp</dimen>
     <dimen name="title_max_height">50dp</dimen>
     <dimen name="list_item_extra_padding">0dp</dimen>
-    <dimen name="icon_padding">8dp</dimen>
+    <dimen name="icon_padding">16dp</dimen>
 
     <!-- Icon Sizes -->
     <dimen name="detail_icon">96dp</dimen>

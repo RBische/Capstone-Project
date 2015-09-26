@@ -9,12 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.data.RunContract;
-import fr.bischof.raphael.gothiite.dateformat.DateToShowFormat;
-import fr.bischof.raphael.gothiite.fragment.SessionTypeFragment;
 
 /**
  * Adapter that shows session types
@@ -46,6 +42,9 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
         runTypeAdapterViewHolder.mTvTitle.setText(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
         runTypeAdapterViewHolder.mTvSubtitle.setText(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
         runTypeAdapterViewHolder.mIvRun.setImageResource(mContext.getResources().getIdentifier(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON)), "drawable", mContext.getPackageName()));
+        if (mCursor.getInt(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED))!=1){
+            runTypeAdapterViewHolder.mIvRun.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -61,6 +60,7 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
 
     public interface RunTypeAdapterOnClickHandler {
         void onClick(String runTypeId, RunTypeAdapterViewHolder vh);
+        void onEditClick(String runTypeId, RunTypeAdapterViewHolder vh);
     }
 
     public class RunTypeAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -73,7 +73,8 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
             mTvTitle = (TextView) view.findViewById(R.id.tvTitle);
             mTvSubtitle = (TextView) view.findViewById(R.id.tvSubtitle);
             mIvRun = (ImageView) view.findViewById(R.id.ivRun);
-            view.setOnClickListener(this);
+            view.findViewById(R.id.ivEdit).setOnClickListener(this);
+            view.findViewById(R.id.llContent).setOnClickListener(this);
         }
 
         @Override
@@ -81,7 +82,11 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             int dateColumnIndex = mCursor.getColumnIndex(RunContract.RunTypeEntry._ID);
-            mClickHandler.onClick(mCursor.getString(dateColumnIndex), this);
+            if (view.getId()==R.id.ivEdit){
+                mClickHandler.onEditClick(mCursor.getString(dateColumnIndex), this);
+            }else{
+                mClickHandler.onClick(mCursor.getString(dateColumnIndex), this);
+            }
         }
     }
 }

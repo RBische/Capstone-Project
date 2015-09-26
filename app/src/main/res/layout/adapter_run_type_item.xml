@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:background="@drawable/touch_selector"
-    android:paddingLeft="@dimen/list_item_extra_padding"
-    android:paddingRight="@dimen/list_item_extra_padding">
+    android:paddingLeft="@dimen/list_item_extra_padding">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
@@ -16,7 +15,10 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin">
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:id="@+id/llContent"
+        android:layout_toLeftOf="@+id/ivDelete"
+        android:layout_toStartOf="@+id/ivDelete">
         <ImageView
             android:id="@+id/ivRun"
             android:layout_gravity="center"
@@ -45,4 +47,15 @@
                 tools:text="Speed increase each 2 minutes" />
         </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+
+    <ImageView
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:src="@drawable/ic_mode_edit_black_48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="@dimen/icon_padding"
+        android:id="@+id/ivEdit"
+        android:contentDescription="@string/edit"
+        />
+</RelativeLayout>

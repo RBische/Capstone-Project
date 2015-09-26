@@ -27,7 +27,7 @@ import fr.bischof.raphael.gothiite.data.RunContract;
  */
 public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeIntervalAdapter.RunTypeIntervalViewHolder>
         implements DraggableItemAdapter<RunTypeIntervalAdapter.RunTypeIntervalViewHolder> {
-    private static final String TAG = "MyDraggableItemAdapter";
+    private static final String TAG = RunTypeIntervalAdapter.class.getSimpleName();
     private final Context mContext;
     private final OnItemClickDeleteListener mListener;
     private Cursor mCursor;
@@ -133,7 +133,7 @@ public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeInterval
 
     @Override
     public boolean onCheckCanStartDrag(RunTypeIntervalViewHolder holder, int position, int x, int y) {
-        return true;
+        return x<holder.mDragHandle.getMeasuredWidth();
     }
 
     @Override

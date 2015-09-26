@@ -48,6 +48,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
             RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO};
+    public static final String RUN_TYPE_ID = "runTypeID";
     @InjectView(R.id.etName)
     EditText etName;
     @InjectView(R.id.etDescription)
@@ -86,13 +87,26 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             }
         }
         if (savedInstanceState!=null){
-            mEverInserted = savedInstanceState.getBoolean(SAVED_EVER_INSERTED,false);
+            mEverInserted = savedInstanceState.getBoolean(SAVED_EVER_INSERTED, false);
             String textualParseId = savedInstanceState.getString(SAVED_PARSE_ID);
             if (textualParseId!=null){
                 mRunTypeID = textualParseId;
             }
         }else{
-            mRunTypeID = UUID.randomUUID().toString();
+            if (getArguments().containsKey(RUN_TYPE_ID)){
+                mRunTypeID = getArguments().getString(RUN_TYPE_ID);
+                Cursor cursor = getActivity().getContentResolver().query(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),new String[]{RunContract.RunTypeEntry.COLUMN_NAME, RunContract.RunTypeEntry.COLUMN_DESCRIPTION, RunContract.RunTypeEntry.COLUMN_ICON},null,null,null);
+                if (cursor!=null){
+                    if (cursor.getCount()>0){
+                        cursor.moveToFirst();
+                        etName.setText(cursor.getString(cursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
+                        etDescription.setText(cursor.getString(cursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+                    }
+                    cursor.close();
+                }
+            }else {
+                mRunTypeID = UUID.randomUUID().toString();
+            }
         }
         return v;
     }
@@ -249,6 +263,22 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             public void onClick(DialogInterface dialogInterface, int i) {
                 ContentResolver contentResolver = getContext().getContentResolver();
                 contentResolver.delete(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(id),null,null);
+            }
+        }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        }).create();
+        dialog.show();
+    }
+
+    public void deleteRunType() {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle(getString(R.string.confirm)).setMessage(getString(R.string.sure_delete_run_type)).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                ContentResolver contentResolver = getContext().getContentResolver();
+                contentResolver.delete(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),null,null);
+                getActivity().finish();
             }
         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override

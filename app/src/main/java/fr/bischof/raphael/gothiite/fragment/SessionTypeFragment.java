@@ -36,6 +36,7 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
     private static final String[] RUN_TYPES_PROJECTION = {RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry._ID,
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_NAME,
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON,
+            RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_DESCRIPTION};
     @InjectView(R.id.rvRunTypes)
     RecyclerView mRvRunTypes;
@@ -107,5 +108,12 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
         /*Intent i = new Intent(getActivity(), DetailsActivity.class);
         i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(runId));
         startActivity(i);*/
+    }
+
+    @Override
+    public void onEditClick(String runTypeId, RunTypeAdapter.RunTypeAdapterViewHolder vh) {
+        Intent i = new Intent(getActivity(), CreateSessionTypeActivity.class);
+        i.putExtra(CreateSessionTypeFragment.RUN_TYPE_ID,runTypeId);
+        startActivity(i);
     }
 }

@@ -123,6 +123,13 @@ public class RunProvider extends ContentProvider {
                 retCursor = getRunTypes(projection, sortOrder);
                 break;
             }
+            case RUN_TYPE:
+            {
+                String selectionPrecise = RunContract.RunTypeEntry._ID +"=?";
+                String[] selectionArgsPrecise = new String[]{RunContract.RunTypeEntry.getRunTypeIdFromUri(uri)};
+                retCursor = getRunType(projection,selectionPrecise,selectionArgsPrecise, sortOrder);
+                break;
+            }
             case RUN_INTERVALS:
             {
                 retCursor = getRunIntervals(projection, sortOrder);
@@ -145,6 +152,17 @@ public class RunProvider extends ContentProvider {
             retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
         return retCursor;
+    }
+
+    private Cursor getRunType(String[] projection, String selectionPrecise, String[] selectionArgsPrecise, String sortOrder) {
+        return sRunTypesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selectionPrecise,
+                selectionArgsPrecise,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     private Cursor getRunTypeIntervals(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
@@ -375,8 +393,21 @@ public class RunProvider extends ContentProvider {
             case RUN_TYPE_INTERVAL: {
                 String selection = RunContract.RunTypeIntervalEntry._ID +"=?";
                 String[] selectionArgs = new String[]{RunContract.RunTypeIntervalEntry.getRunTypeIntervalIdFromUri(uri)};
-                rowsDeleted = db.delete(
-                        RunContract.RunTypeIntervalEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(RunContract.RunTypeIntervalEntry.TABLE_NAME, selection, selectionArgs);
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunTypeEntry.buildRunTypesUri(), null);
+                    getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
+                }
+                break;
+            }
+            case RUN_TYPE: {
+                String selection = RunContract.RunTypeEntry._ID +"=? and "+ RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED +"=1";
+                String selectionRunTypeInterval = RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID +"=?";
+                String[] selectionArgs = new String[]{RunContract.RunTypeEntry.getRunTypeIdFromUri(uri)};
+                rowsDeleted = db.delete(RunContract.RunTypeEntry.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted>0){
+                    db.delete(RunContract.RunTypeIntervalEntry.TABLE_NAME, selectionRunTypeInterval, selectionArgs);
+                }
                 if (getContext()!=null){
                     getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
                 }

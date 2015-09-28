@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ebm="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -76,14 +77,17 @@
     </android.support.design.widget.CoordinatorLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="75dp">
         <lt.lemonlabs.android.expandablebuttonmenu.ExpandableMenuOverlay
             android:id="@+id/button_menu"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:src="@drawable/ico_run"
+            ebm:mainButtonSize="0.15"
+            ebm:dimAmount="0.5"
             />
     </RelativeLayout>
 </FrameLayout>

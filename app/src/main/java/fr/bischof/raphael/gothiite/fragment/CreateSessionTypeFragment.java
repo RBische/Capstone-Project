@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
@@ -35,16 +36,18 @@ import java.util.UUID;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.adapter.IconAdapter;
 import fr.bischof.raphael.gothiite.adapter.RunTypeIntervalAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, RunTypeIntervalAdapter.OnItemClickDeleteListener {
+public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, RunTypeIntervalAdapter.OnItemClickDeleteListener{
     private static final int RUN_TYPE_LOADER = 1;
     private static final java.lang.String SAVED_PARSE_ID = "parseId";
     private static final java.lang.String SAVED_EVER_INSERTED = "everInserted";
+    private static final java.lang.String SAVED_ICON = "icon";
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
             RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO};
@@ -53,12 +56,15 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     EditText etName;
     @InjectView(R.id.etDescription)
     EditText etDescription;
+    @InjectView(R.id.ivIcon)
+    ImageView ivIcon;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private RunTypeIntervalAdapter mAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
     private String mRunTypeID;
+    private String mIconChoosed = "ico_run";
     private Uri mUri;
     private boolean mEverInserted = false;
 
@@ -88,6 +94,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         }
         if (savedInstanceState!=null){
             mEverInserted = savedInstanceState.getBoolean(SAVED_EVER_INSERTED, false);
+            mIconChoosed = savedInstanceState.getString(SAVED_ICON,"ico_run");
             String textualParseId = savedInstanceState.getString(SAVED_PARSE_ID);
             if (textualParseId!=null){
                 mRunTypeID = textualParseId;
@@ -101,6 +108,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
                         cursor.moveToFirst();
                         etName.setText(cursor.getString(cursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
                         etDescription.setText(cursor.getString(cursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+                        mIconChoosed = cursor.getString(cursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON));
                     }
                     cursor.close();
                 }
@@ -108,7 +116,31 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
                 mRunTypeID = UUID.randomUUID().toString();
             }
         }
+        ivIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                askWhichIcon();
+            }
+        });
+        refreshIcon();
         return v;
+    }
+
+    private void refreshIcon() {
+        ivIcon.setImageResource(getActivity().getResources().getIdentifier(mIconChoosed, "drawable", getActivity().getPackageName()));
+    }
+
+    private void askWhichIcon() {
+        AlertDialog.Builder builder     = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.choose_icon));
+        builder.setAdapter(new IconAdapter(getActivity()), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int position) {
+                mIconChoosed = getResources().getStringArray(R.array.icon_resource_name)[position];
+                saveRunType();
+                refreshIcon();
+            }
+        });
     }
 
     private void addItem() {
@@ -122,6 +154,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         super.onSaveInstanceState(outState);
         outState.putString(SAVED_PARSE_ID, mRunTypeID);
         outState.putBoolean(SAVED_EVER_INSERTED, mEverInserted);
+        outState.putString(SAVED_ICON,mIconChoosed);
     }
 
     @Override
@@ -236,9 +269,8 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
 
     private void saveRunType(){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(RunContract.RunTypeEntry._ID,mRunTypeID);
-        //TODO: Make an icon picker
-        contentValues.put(RunContract.RunTypeEntry.COLUMN_ICON,"ico_run");
+        contentValues.put(RunContract.RunTypeEntry._ID, mRunTypeID);
+        contentValues.put(RunContract.RunTypeEntry.COLUMN_ICON,mIconChoosed);
         if (!etName.getText().toString().equals("")){
             contentValues.put(RunContract.RunTypeEntry.COLUMN_NAME,etName.getText().toString());
         }else{
@@ -262,7 +294,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 ContentResolver contentResolver = getContext().getContentResolver();
-                contentResolver.delete(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(id),null,null);
+                contentResolver.delete(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(id), null, null);
             }
         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override

@@ -141,6 +141,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
                 refreshIcon();
             }
         });
+        builder.show();
     }
 
     private void addItem() {

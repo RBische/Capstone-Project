@@ -277,7 +277,7 @@ public class RunProvider extends ContentProvider {
             case RUN_INTERVAL: {
                 long _id = db.insert(RunContract.RunIntervalEntry.TABLE_NAME, null, contentValues);
                 if ( _id > 0 )
-                    returnUri = RunContract.RunIntervalEntry.buildRunIntervalUri(_id);
+                    returnUri = RunContract.RunIntervalEntry.buildRunIntervalUri(contentValues.getAsString(RunContract.RunIntervalEntry._ID));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -441,6 +441,21 @@ public class RunProvider extends ContentProvider {
                 db.update(RunContract.RunTypeIntervalEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 if(getContext()!=null){
                     getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
+                }
+                break;
+            }
+            case RUN: {
+                String whereClause = RunContract.RunEntry._ID+"=?";
+                String[] whereArgs = new String[]{RunContract.RunEntry.getRunIdFromUri(uri)};
+                db.update(RunContract.RunEntry.TABLE_NAME, contentValues, whereClause,whereArgs);
+                break;
+            }
+            case RUN_INTERVAL: {
+                String whereClause = RunContract.RunIntervalEntry._ID+"=?";
+                String[] whereArgs = new String[]{RunContract.RunIntervalEntry.getRunIntervalIdFromUri(uri)};
+                db.update(RunContract.RunIntervalEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                if(getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunIntervalEntry.buildRunIntervalsUri(), null);
                 }
                 break;
             }

@@ -24,6 +24,7 @@ import fr.bischof.raphael.gothiite.activity.DetailsActivity;
 import fr.bischof.raphael.gothiite.activity.SessionTypeActivity;
 import fr.bischof.raphael.gothiite.adapter.RunAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
+import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 
 /**
@@ -87,6 +88,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         String sortOrder = RunContract.RunEntry.COLUMN_START_DATE + " DESC";
 
+        GothiiteSyncAdapter.syncImmediately(getActivity());
         Uri runsWithRunTypeUri = RunContract.RunEntry.buildRunsWithRunTypeUri();
 
         return new CursorLoader(getActivity(),

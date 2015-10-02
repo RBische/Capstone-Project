@@ -65,6 +65,10 @@ public class RunContract  {
         public static Uri buildRunsWithRunTypeUri() {
             return CONTENT_JOINED_URI;
         }
+
+        public static String getRunIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     /* Inner class that defines the table contents of the run interval table */
@@ -92,8 +96,8 @@ public class RunContract  {
         public static final String COLUMN_END_DATE = "end_date";
         public static final String COLUMN_RUN_ID = "run_id";
 
-        public static Uri buildRunIntervalUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildRunIntervalUri(String id) {
+            return Uri.parse(CONTENT_URI + "/" + id);
         }
 
         public static Uri buildRunIntervalsWithRunUri(String id) {
@@ -105,6 +109,10 @@ public class RunContract  {
         }
 
         public static String getRunIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static String getRunIntervalIdFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
     }

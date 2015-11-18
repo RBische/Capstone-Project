@@ -50,7 +50,8 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     private static final java.lang.String SAVED_ICON = "icon";
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
-            RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO};
+            RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO,
+            RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO};
     public static final String RUN_TYPE_ID = "runTypeID";
     @InjectView(R.id.etName)
     EditText etName;

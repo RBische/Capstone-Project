@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,7 +88,12 @@ public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeInterval
         mCursor.moveToPosition(position);
         boolean effort = mCursor.getInt(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
         long time = mCursor.getLong(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
-        holder.mTextView.setText(""+(time/1000)+mContext.getString(effort ? R.string.second_effort : R.string.txt_rest));
+        long distance = mCursor.getLong(mCursor.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO));
+        String lineText = ""+(time/1000)+mContext.getString(effort ? R.string.second_effort : R.string.txt_rest);
+        if (distance!=0){
+            lineText = lineText + " (" + distance + "m)";
+        }
+        holder.mTextView.setText(lineText);
     }
 
     @Override

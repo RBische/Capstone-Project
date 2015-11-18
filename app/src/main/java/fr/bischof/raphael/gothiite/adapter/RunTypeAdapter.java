@@ -41,9 +41,10 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
         mCursor.moveToPosition(position);
         runTypeAdapterViewHolder.mTvTitle.setText(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
         runTypeAdapterViewHolder.mTvSubtitle.setText(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
-        runTypeAdapterViewHolder.mIvRun.setImageResource(mContext.getResources().getIdentifier(mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON)), "drawable", mContext.getPackageName()));
+        String icon = mCursor.getString(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON));
+        runTypeAdapterViewHolder.mIvRun.setImageResource(mContext.getResources().getIdentifier(icon, "drawable", mContext.getPackageName()));
         if (mCursor.getInt(mCursor.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED))!=1){
-            runTypeAdapterViewHolder.mIvRun.setVisibility(View.GONE);
+            runTypeAdapterViewHolder.mIvEdit.setVisibility(View.GONE);
         }
     }
 
@@ -67,12 +68,14 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
         public final TextView mTvTitle;
         public final TextView mTvSubtitle;
         public final ImageView mIvRun;
+        public final ImageView mIvEdit;
 
         public RunTypeAdapterViewHolder(View view) {
             super(view);
             mTvTitle = (TextView) view.findViewById(R.id.tvTitle);
             mTvSubtitle = (TextView) view.findViewById(R.id.tvSubtitle);
             mIvRun = (ImageView) view.findViewById(R.id.ivRun);
+            mIvEdit = (ImageView) view.findViewById(R.id.ivEdit);
             view.findViewById(R.id.ivEdit).setOnClickListener(this);
             view.findViewById(R.id.llContent).setOnClickListener(this);
         }

@@ -3,8 +3,8 @@ package fr.bischof.raphael.gothiite.fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -20,10 +20,8 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.activity.CreateRunActivity;
 import fr.bischof.raphael.gothiite.activity.CreateSessionTypeActivity;
-import fr.bischof.raphael.gothiite.activity.DetailsActivity;
-import fr.bischof.raphael.gothiite.activity.SessionTypeActivity;
-import fr.bischof.raphael.gothiite.adapter.RunAdapter;
 import fr.bischof.raphael.gothiite.adapter.RunTypeAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
 
@@ -105,9 +103,9 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onClick(String runTypeId, RunTypeAdapter.RunTypeAdapterViewHolder vh) {
-        /*Intent i = new Intent(getActivity(), DetailsActivity.class);
-        i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(runId));
-        startActivity(i);*/
+        Intent i = new Intent(getActivity(), CreateRunActivity.class);
+        i.setData(RunContract.RunTypeEntry.buildRunTypeUri(runTypeId));
+        startActivity(i);
     }
 
     @Override

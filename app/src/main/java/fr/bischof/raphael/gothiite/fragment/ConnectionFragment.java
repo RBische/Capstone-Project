@@ -16,6 +16,8 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import java.util.UUID;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
@@ -99,6 +101,14 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
                                     ParseUser.logInInBackground(mEtLogin.getText().toString(), mEtPassword.getText().toString(), new LogInCallback() {
                                         public void done(ParseUser user, ParseException e) {
                                             if (user != null) {
+                                                if(user.getString("userId")==null){
+                                                    user.put("userId", UUID.randomUUID().toString());
+                                                    try {
+                                                        user.save();
+                                                    } catch (ParseException e1) {
+                                                        mTvError.setText(getString(R.string.error_save_user_id));
+                                                    }
+                                                }
                                                 successfulLogin();
                                             } else if (e.getCode() == 101) {
                                                 mBtnSubmit.setEnabled(true);

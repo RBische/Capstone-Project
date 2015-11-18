@@ -1,17 +1,20 @@
 package fr.bischof.raphael.gothiite.activity;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import com.parse.ParseUser;
+
+import java.io.File;
 
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.data.RunContract;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +46,29 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_connection){
             Intent connectionIntent = new Intent(this,ConnectionActivity.class);
             startActivity(connectionIntent);
+        }else if (id == R.id.action_wipe_data){
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            File dbFile = new File("run.db");
+                            //TODO: Correctly find the db file
+                            if (dbFile.exists()){
+                                dbFile.delete();
+                                if (ParseUser.getCurrentUser()!=null){
+                                    ParseUser.logOut();
+                                }
+                                getContentResolver().notifyChange(RunContract.RunEntry.buildRunsWithRunTypeUri(), null);
+                            }
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.sure_wipe_data)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                    .setNegativeButton(getString(R.string.no), dialogClickListener).show();
         }
         return super.onOptionsItemSelected(item);
     }

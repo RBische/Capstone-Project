@@ -6,9 +6,9 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -31,6 +31,8 @@ import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemA
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import butterknife.ButterKnife;
@@ -39,6 +41,8 @@ import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.adapter.IconAdapter;
 import fr.bischof.raphael.gothiite.adapter.RunTypeIntervalAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
+import fr.bischof.raphael.gothiite.ui.ColorPart;
+import fr.bischof.raphael.gothiite.ui.IntervalView;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -59,6 +63,8 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     EditText etDescription;
     @InjectView(R.id.ivIcon)
     ImageView ivIcon;
+    @InjectView(R.id.invRunType)
+    IntervalView mInvRunType;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private RunTypeIntervalAdapter mAdapter;
@@ -246,6 +252,16 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        List<ColorPart> partsToDraw = new ArrayList<>();
+        while (data.moveToNext()) {
+            boolean effort = data.getInt(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
+            long time = data.getLong(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
+            int timeInSec = (int)time;
+            ColorPart part = new ColorPart(timeInSec,!effort);
+            partsToDraw.add(part);
+        }
+        mInvRunType.updateParts(partsToDraw);
+        data.moveToFirst();
         mAdapter.swapCursor(data);
     }
 

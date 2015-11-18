@@ -92,7 +92,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING, true);
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_NAME, mContext.getString(R.string.leger_test_name));
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_ICON, mContext.getString(R.string.icon_leger_test));
-        tabataRunType.put(RunContract.RunTypeEntry._ID, "IP3Asv0Lq4");
+        tabataRunType.put(RunContract.RunTypeEntry._ID, "739c19d4-f987-4c87-a160-6de74017a3d1");
         sqLiteDatabase.insert(RunContract.RunTypeEntry.TABLE_NAME, null, tabataRunType);
         long[] timeToDo = new long[]{128500,135000,120000,126000,130800,120000,124600,128600,120000,123800,127100,120000,123100,126000,120000,122700,125200,120000,122400,124600};
         int[] distanceToDo = new int[]{250,300,300,350,400,400,450,500,500,550,600,600,650,700,700,750,800,800,850,900};
@@ -117,7 +117,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING, false);
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_NAME, mContext.getString(R.string.tabata));
         tabataRunType.put(RunContract.RunTypeEntry.COLUMN_ICON, mContext.getString(R.string.icon_tabata));
-        tabataRunType.put(RunContract.RunTypeEntry._ID, "NzJfaCp6iY");
+        tabataRunType.put(RunContract.RunTypeEntry._ID, "db45f67a-70eb-401d-9e01-4aa42f1220d2");
         sqLiteDatabase.insert(RunContract.RunTypeEntry.TABLE_NAME, null, tabataRunType);
         for(int i =0;i<15;i++){
             int timeToDo = 10000;

@@ -20,6 +20,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,6 +53,19 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE,
             RunContract.RunIntervalEntry.COLUMN_ORDER,
             RunContract.RunIntervalEntry.COLUMN_RUN_ID};
+    private static final String[] RUN_TYPE_PROJECTION = {RunContract.RunTypeEntry._ID,
+            RunContract.RunTypeEntry.COLUMN_DESCRIPTION,
+            RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,
+            RunContract.RunTypeEntry.COLUMN_NAME,
+            RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING,
+            RunContract.RunTypeEntry.COLUMN_ICON};
+    private static final String[] RUN_TYPE_INTERVAL_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
+            RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO,
+            RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO,
+            RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED,
+            RunContract.RunTypeIntervalEntry.COLUMN_ORDER,
+            RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
+            RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID};
     private ContentResolver mContentResolver;
 
     public GothiiteSyncAdapter(Context context, boolean autoInitialize) {
@@ -161,7 +175,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             List<ParseObject> runTypes = query.find();
             Uri runTypesUri = RunContract.RunTypeEntry.buildRunTypesUri();
-            Cursor runTypesData = mContentResolver.query(runTypesUri, RUN_PROJECTION, null, null, null);
+            final Cursor runTypesData = mContentResolver.query(runTypesUri, RUN_TYPE_PROJECTION, null, null, null);
             ArrayList<ParseObject> runTypesToSend = new ArrayList<>();
             ArrayList<ContentValues> runTypesToSave = new ArrayList<>();
             if (runTypesData!=null){
@@ -175,14 +189,22 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 runTypesData.moveToFirst();
                 while (!runTypesData.isAfterLast()){
                     localCurrentRunTypesId.add(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)));
-                    if (!serverCurrentRunTypesId.contains(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)))){
-                        ParseObject runTypeToSend = new ParseObject("RunType");
-                        runTypeToSend.add("name", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
-                        runTypeToSend.add("distanceGrowing", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING)) == 1);
-                        runTypeToSend.add("canBeDeleted", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1);
-                        runTypeToSend.add("description", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
-                        runTypeToSend.add("userId", currentUser);
-                        runTypeToSend.setObjectId(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)));
+                    if (!serverCurrentRunTypesId.contains(runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID)))
+                            &&runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1){
+                        final ParseObject runTypeToSend = new ParseObject("RunType");
+                        runTypeToSend.put("name", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
+                        runTypeToSend.put("distanceGrowing", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING)) == 1);
+                        runTypeToSend.put("canBeDeleted", runTypesData.getInt(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED)) == 1);
+                        runTypeToSend.put("description", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+                        runTypeToSend.put("icon", runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry.COLUMN_ICON)));
+                        runTypeToSend.put("userId", currentUser);
+                        final String runTypeId = runTypesData.getString(runTypesData.getColumnIndex(RunContract.RunTypeEntry._ID));
+                        runTypeToSend.save();
+                        runTypeToSend.fetch();
+                        Uri runTypeUri = RunContract.RunTypeEntry.buildRunTypeUri(runTypeId);
+                        ContentValues cv = new ContentValues();
+                        cv.put(RunContract.RunTypeEntry._ID, runTypeToSend.getObjectId());
+                        mContentResolver.update(runTypeUri, cv, null, null);
                         runTypesToSend.add(runTypeToSend);
                     }
                     runTypesData.moveToNext();
@@ -196,11 +218,11 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION,serverObject.getString("description"));
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_DISTANCE_GROWING,serverObject.getBoolean("distanceGrowing") ? 1 : 0);
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_NAME,serverObject.getString("name"));
+                        valuesToSave.put(RunContract.RunTypeEntry.COLUMN_ICON,serverObject.getString("icon"));
                         valuesToSave.put(RunContract.RunTypeEntry._ID,serverObject.getObjectId());
                         runTypesToSave.add(valuesToSave);
                     }
                 }
-                ParseObject.saveAll(runTypesToSend);
                 mContentResolver.bulkInsert(runTypesUri, runTypesToSave.toArray(new ContentValues[runTypesToSave.size()]));
                 syncRunTypeIntervals(serverCurrentRunTypesToRetrieveId, runTypesToSend);
             }
@@ -235,32 +257,37 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 ids.add(runTypeToSend.getObjectId());
                 parameters.add("?");
             }
-            Cursor runTypeIntervalsData = mContentResolver.query(runTypeIntervalsUri,RUN_INTERVAL_PROJECTION,RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
+            Cursor runTypeIntervalsData = mContentResolver.query(runTypeIntervalsUri,RUN_TYPE_INTERVAL_PROJECTION,RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
             if (runTypeIntervalsData!=null) {
                 runTypeIntervalsData.moveToFirst();
                 while (!runTypeIntervalsData.isAfterLast()){
-                    ParseObject runIntervalToSend = new ParseObject("RunInterval");
-                    runIntervalToSend.add("distanceToDo", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO)));
-                    runIntervalToSend.add("effort", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1);
-                    runIntervalToSend.add("order", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_ORDER)));
-                    runIntervalToSend.add("speedEstimated", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED)));
-                    runIntervalToSend.add("timeToDo", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO)));
-                    runIntervalToSend.setObjectId(runTypeIntervalsData.getString(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry._ID)));
+                    ParseObject runIntervalToSend = new ParseObject("RunTypeInterval");
+                    runIntervalToSend.put("distanceToDo", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO)));
+                    runIntervalToSend.put("effort", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT)) == 1);
+                    runIntervalToSend.put("order", runTypeIntervalsData.getInt(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_ORDER)));
+                    runIntervalToSend.put("speedEstimated", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED)));
+                    runIntervalToSend.put("timeToDo", runTypeIntervalsData.getDouble(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO)));
                     for (ParseObject runTypeToSend : runTypesToSend) {
                         if (runTypeToSend.getObjectId().equals(runTypeIntervalsData.getString(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID)))){
-                            runIntervalToSend.add("runTypeId", runTypeToSend);
+                            runIntervalToSend.put("runTypeId", runTypeToSend);
                         }
                     }
+                    runIntervalToSend.save();
+                    runIntervalToSend.fetch();
+                    final String runTypeIntervalId = runTypeIntervalsData.getString(runTypeIntervalsData.getColumnIndex(RunContract.RunTypeIntervalEntry._ID));
+                    Uri runTypeIntervalUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(runTypeIntervalId);
+                    ContentValues cv = new ContentValues();
+                    cv.put(RunContract.RunTypeIntervalEntry._ID, runIntervalToSend.getObjectId());
+                    mContentResolver.update(runTypeIntervalUri, cv, null, null);
                     runTypeIntervalsToSend.add(runIntervalToSend);
                     runTypeIntervalsData.moveToNext();
                 }
                 runTypeIntervalsData.close();
             }
-            ParseObject.saveAll(runTypeIntervalsToSend);
             mContentResolver.bulkInsert(runTypeIntervalsUri, runTypeIntervalsToSave.toArray(new ContentValues[runTypeIntervalsToSave.size()]));
 
         } catch (ParseException e) {
-            Log.e(TAG, "Error retrieving runIntervals : " + e.getMessage());
+            Log.e(TAG, "Error retrieving runTypeIntervals : " + e.getMessage());
         }
     }
 
@@ -277,7 +304,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 //Preparing comparison by storing ids in a list
                 ArrayList<String> serverCurrentRunsId = new ArrayList<>();
                 ArrayList<String> localCurrentRunsId = new ArrayList<>();
-                ArrayList<String> serverCurrentRunsToRetrieveId = new ArrayList<>();
+                ArrayList<ParseObject> serverCurrentRunsToRetrieveId = new ArrayList<>();
                 for(ParseObject serverObject:runs){
                     serverCurrentRunsId.add(serverObject.getObjectId());
                 }
@@ -288,12 +315,18 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         Calendar runDate = Calendar.getInstance();
                         runDate.setTimeInMillis(runsData.getLong(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_START_DATE)));
                         ParseObject runToSend = new ParseObject("Run");
-                        runToSend.add("startDate", runDate.getTime());
-                        runToSend.add("averageSpeed", runsData.getDouble(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_AVG_SPEED)));
-                        runToSend.add("vVO2maxEquivalent", runsData.getDouble(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT)));
-                        runToSend.add("runTypeId", runsData.getString(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_RUN_TYPE_ID)));
-                        runToSend.add("userId", currentUser);
-                        runToSend.setObjectId(runsData.getString(runsData.getColumnIndex(RunContract.RunEntry._ID)));
+                        runToSend.put("startDate", runDate.getTime());
+                        runToSend.put("averageSpeed", runsData.getDouble(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_AVG_SPEED)));
+                        runToSend.put("vVO2maxEquivalent", runsData.getDouble(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT)));
+                        runToSend.put("runTypeId", runsData.getString(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_RUN_TYPE_ID)));
+                        runToSend.put("userId", currentUser);
+                        final String runId = runsData.getString(runsData.getColumnIndex(RunContract.RunEntry._ID));
+                        runToSend.save();
+                        runToSend.fetch();
+                        Uri runUri = RunContract.RunEntry.buildRunUri(runId);
+                        ContentValues cv = new ContentValues();
+                        cv.put(RunContract.RunTypeEntry._ID, runToSend.getObjectId());
+                        mContentResolver.update(runUri, cv, null, null);
                         runsToSend.add(runToSend);
                     }
                     runsData.moveToNext();
@@ -301,7 +334,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 runsData.close();
                 for(ParseObject serverObject:runs){
                     if (!localCurrentRunsId.contains(serverObject.getObjectId())){
-                        serverCurrentRunsToRetrieveId.add(serverObject.getObjectId());
+                        serverCurrentRunsToRetrieveId.add(serverObject);
                         ContentValues valuesToSave = new ContentValues();
                         valuesToSave.put(RunContract.RunEntry.COLUMN_AVG_SPEED,serverObject.getDouble("averageSpeed"));
                         valuesToSave.put(RunContract.RunEntry.COLUMN_RUN_TYPE_ID,serverObject.getParseObject("runTypeId").getObjectId());
@@ -311,7 +344,6 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         runsToSave.add(valuesToSave);
                     }
                 }
-                ParseObject.saveAll(runsToSend);
                 mContentResolver.bulkInsert(runsUri, runsToSave.toArray(new ContentValues[runsToSave.size()]));
                 syncRunIntervals(serverCurrentRunsToRetrieveId,runsToSend);
             }
@@ -321,7 +353,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void syncRunIntervals(ArrayList<String> serverCurrentRunsToRetrieveId, ArrayList<ParseObject> runsToSend) {
+    private void syncRunIntervals(ArrayList<ParseObject> serverCurrentRunsToRetrieveId, ArrayList<ParseObject> runsToSend) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("RunInterval");
         query.whereContainedIn("runId", serverCurrentRunsToRetrieveId);
         try {
@@ -358,26 +390,32 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                     Calendar runIntervalEndDate = Calendar.getInstance();
                     runIntervalEndDate.setTimeInMillis(runIntervalsData.getLong(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_END_DATE)));
                     ParseObject runIntervalToSend = new ParseObject("RunInterval");
-                    runIntervalToSend.add("startDate", runIntervalStartDate.getTime());
-                    runIntervalToSend.add("endDate", runIntervalEndDate.getTime());
-                    runIntervalToSend.add("endPositionLatitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LATITUDE)));
-                    runIntervalToSend.add("endPositionLongitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE)));
-                    runIntervalToSend.add("order", runIntervalsData.getInt(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_ORDER)));
-                    runIntervalToSend.add("distanceDone", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE)));
-                    runIntervalToSend.add("startPositionLatitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LATITUDE)));
-                    runIntervalToSend.add("startPositionLongitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE)));
+                    runIntervalToSend.put("startDate", runIntervalStartDate.getTime());
+                    runIntervalToSend.put("endDate", runIntervalEndDate.getTime());
+                    runIntervalToSend.put("endPositionLatitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LATITUDE)));
+                    runIntervalToSend.put("endPositionLongitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE)));
+                    runIntervalToSend.put("order", runIntervalsData.getInt(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_ORDER)));
+                    runIntervalToSend.put("distanceDone", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE)));
+                    runIntervalToSend.put("startPositionLatitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LATITUDE)));
+                    runIntervalToSend.put("startPositionLongitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE)));
                     runIntervalToSend.setObjectId(runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunEntry._ID)));
                     for (ParseObject runToSend : runsToSend) {
                         if (runToSend.getObjectId().equals(runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_RUN_ID)))){
                             runIntervalToSend.add("runId", runToSend);
                         }
                     }
+                    runIntervalToSend.save();
+                    runIntervalToSend.fetch();
+                    final String runIntervalId = runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry._ID));
+                    Uri runIntervalUri = RunContract.RunIntervalEntry.buildRunIntervalUri(runIntervalId);
+                    ContentValues cv = new ContentValues();
+                    cv.put(RunContract.RunIntervalEntry._ID, runIntervalToSend.getObjectId());
+                    mContentResolver.update(runIntervalUri, cv, null, null);
                     runIntervalsToSend.add(runIntervalToSend);
                     runIntervalsData.moveToNext();
                 }
                 runIntervalsData.close();
             }
-            ParseObject.saveAll(runIntervalsToSend);
             mContentResolver.bulkInsert(runIntervalsUri, runIntervalsToSave.toArray(new ContentValues[runIntervalsToSave.size()]));
 
         } catch (ParseException e) {

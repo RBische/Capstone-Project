@@ -183,7 +183,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 ArrayList<String> localCurrentRunTypesId = new ArrayList<>();
                 ArrayList<String> serverCurrentRunTypesToRetrieveId = new ArrayList<>();
                 for(ParseObject serverObject:runTypes){
-                    serverCurrentRunTypesId.add(serverObject.getString("userId"));
+                    serverCurrentRunTypesId.add(serverObject.getString("runTypeId"));
                 }
                 runTypesData.moveToFirst();
                 while (!runTypesData.isAfterLast()){
@@ -248,7 +248,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             List<String> ids = new ArrayList<>();
             List<String> parameters = new ArrayList<>();
             for (ParseObject runTypeToSend : runTypesToSend) {
-                ids.add(runTypeToSend.getObjectId());
+                ids.add(runTypeToSend.getString("runId"));
                 parameters.add("?");
             }
             Cursor runTypeIntervalsData = mContentResolver.query(runTypeIntervalsUri,RUN_TYPE_INTERVAL_PROJECTION,RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
@@ -296,7 +296,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 ArrayList<String> localCurrentRunsId = new ArrayList<>();
                 ArrayList<String> serverCurrentRunsToRetrieveId = new ArrayList<>();
                 for(ParseObject serverObject:runs){
-                    serverCurrentRunsId.add(serverObject.getObjectId());
+                    serverCurrentRunsId.add(serverObject.getString("runId"));
                 }
                 runsData.moveToFirst();
                 while (!runsData.isAfterLast()){
@@ -310,6 +310,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                         runToSend.put("vVO2maxEquivalent", runsData.getDouble(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT)));
                         runToSend.put("runTypeId", runsData.getString(runsData.getColumnIndex(RunContract.RunEntry.COLUMN_RUN_TYPE_ID)));
                         runToSend.put("userId", currentUser.getString("userId"));
+                        runToSend.put("runId", runsData.getString(runsData.getColumnIndex(RunContract.RunEntry._ID)));
                         runToSend.save();
                         runsToSend.add(runToSend);
                     }
@@ -362,7 +363,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
             List<String> ids = new ArrayList<>();
             List<String> parameters = new ArrayList<>();
             for (ParseObject runToSend : runsToSend) {
-                ids.add(runToSend.getObjectId());
+                ids.add(runToSend.getString("runId"));
                 parameters.add("?");
             }
             Cursor runIntervalsData = mContentResolver.query(runIntervalsUri,RUN_INTERVAL_PROJECTION,RunContract.RunIntervalEntry.COLUMN_RUN_ID + " in (" + TextUtils.join(",", parameters) + ")",ids.toArray(new String[ids.size()]),null);
@@ -384,7 +385,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                     runIntervalToSend.put("startPositionLongitude", runIntervalsData.getDouble(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE)));
                     runIntervalToSend.put("runIntervalId",runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunEntry._ID)));
                     for (ParseObject runToSend : runsToSend) {
-                        if (runToSend.getObjectId().equals(runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_RUN_ID)))){
+                        if (runToSend.getString("runId").equals(runIntervalsData.getString(runIntervalsData.getColumnIndex(RunContract.RunIntervalEntry.COLUMN_RUN_ID)))){
                             runIntervalToSend.add("runId", runToSend);
                         }
                     }

@@ -52,14 +52,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
-                            File dbFile = new File("run.db");
-                            //TODO: Correctly find the db file
-                            if (dbFile.exists()){
-                                dbFile.delete();
-                                if (ParseUser.getCurrentUser()!=null){
-                                    ParseUser.logOut();
+                            File dir = getDatabasePath("run.db");
+                            if (dir.exists()){
+                                if (dir.delete()){
+                                    if (ParseUser.getCurrentUser()!=null){
+                                        ParseUser.logOut();
+                                    }
+                                    getContentResolver().notifyChange(RunContract.RunEntry.buildRunsWithRunTypeUri(), null);
                                 }
-                                getContentResolver().notifyChange(RunContract.RunEntry.buildRunsWithRunTypeUri(), null);
                             }
                             break;
                     }

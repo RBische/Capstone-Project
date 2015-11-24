@@ -132,7 +132,7 @@ public class RunProvider extends ContentProvider {
             }
             case RUN_INTERVALS:
             {
-                retCursor = getRunIntervals(projection, sortOrder);
+                retCursor = getRunIntervals(projection,selection,selectionArgs, sortOrder);
                 break;
             }
             case RUN_INTERVALS_WITH_RUN:
@@ -187,11 +187,11 @@ public class RunProvider extends ContentProvider {
         );
     }
 
-    private Cursor getRunIntervals(String[] projection, String sortOrder) {
+    private Cursor getRunIntervals(String[] projection,String selection,String[] selectionArgs, String sortOrder) {
         return sRunIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 sortOrder

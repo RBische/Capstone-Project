@@ -81,7 +81,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         AdRequest adRequest = new AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template").build();
         adView.loadAd(adRequest);
-        getLoaderManager().initLoader(RUNS_LOADER, null, this);
+        startLoader();
     }
 
     @Override
@@ -114,5 +114,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Intent i = new Intent(getActivity(), DetailsActivity.class);
         i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(runId));
         startActivity(i);
+    }
+
+    public void removeLoader() {
+        getLoaderManager().destroyLoader(RUNS_LOADER);
+    }
+
+    public void startLoader() {
+        getLoaderManager().initLoader(RUNS_LOADER, null, this);
+        Uri runsWithRunTypeUri = RunContract.RunEntry.buildRunsWithRunTypeUri();
+        String sortOrder = RunContract.RunEntry.COLUMN_START_DATE + " DESC";
+        Cursor cursor = getContext().getContentResolver().query(runsWithRunTypeUri,
+                RUNS_PROJECTION,
+                null,
+                null,
+                sortOrder);
+        String s = "";
     }
 }

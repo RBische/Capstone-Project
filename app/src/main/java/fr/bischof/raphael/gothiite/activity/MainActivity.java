@@ -15,6 +15,9 @@ import java.io.File;
 
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.data.RunContract;
+import fr.bischof.raphael.gothiite.data.RunDbHelper;
+import fr.bischof.raphael.gothiite.fragment.MainFragment;
+import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,7 +61,12 @@ public class MainActivity extends AppCompatActivity {
                                     if (ParseUser.getCurrentUser()!=null){
                                         ParseUser.logOut();
                                     }
+                                    ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).removeLoader();
+                                    RunDbHelper helper = new RunDbHelper(MainActivity.this);
+                                    helper.getWritableDatabase();
+                                    helper.close();
                                     getContentResolver().notifyChange(RunContract.RunEntry.buildRunsWithRunTypeUri(), null);
+                                    ((MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main)).startLoader();
                                 }
                             }
                             break;
@@ -69,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getString(R.string.sure_wipe_data)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                     .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+        }else if (id == R.id.action_sync){
+            GothiiteSyncAdapter.syncImmediately(this);
         }
         return super.onOptionsItemSelected(item);
     }

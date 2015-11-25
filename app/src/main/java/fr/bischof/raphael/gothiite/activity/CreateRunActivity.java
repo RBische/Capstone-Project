@@ -2,10 +2,11 @@ package fr.bischof.raphael.gothiite.activity;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 
 import fr.bischof.raphael.gothiite.R;
 
-public class CreateRunActivity extends Activity {
+public class CreateRunActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

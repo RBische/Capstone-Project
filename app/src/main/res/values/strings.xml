@@ -69,4 +69,9 @@
     <string name="action_wipe_data">Wipe data</string>
     <string name="sure_wipe_data">Are you sure you want to wipe data ?</string>
     <string name="action_sync">Synchronize</string>
+    <string name="gps_signal">Gps signal</string>
+    <string name="sample_description">20s effort * 8 + 10s rest * 8</string>
+    <string name="sample_run_type">Tabata</string>
+    <string name="sample_last_speed">vVO2max (last 14 km/h)</string>
+    <string name="speed_unit">km/h</string>
 </resources>

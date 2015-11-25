@@ -27,7 +27,6 @@ public class RunProvider extends ContentProvider {
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private RunDbHelper mOpenHelper;
     private static final SQLiteQueryBuilder sRunsQueryBuilder;
     private static final SQLiteQueryBuilder sRunIntervalsQueryBuilder;
     private static final SQLiteQueryBuilder sRunIntervalsWithRunQueryBuilder;
@@ -99,7 +98,6 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mOpenHelper = new RunDbHelper(getContext());
         return true;
     }
 
@@ -155,7 +153,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunType(String[] projection, String selectionPrecise, String[] selectionArgsPrecise, String sortOrder) {
-        return sRunTypesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunTypesQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 selectionPrecise,
                 selectionArgsPrecise,
@@ -166,7 +164,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunTypeIntervals(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return sRunTypeIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunTypeIntervalsQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -177,7 +175,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunTypes(String[] projection, String sortOrder) {
-        return sRunTypesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunTypesQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 null,
                 null,
@@ -188,7 +186,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunIntervals(String[] projection,String selection,String[] selectionArgs, String sortOrder) {
-        return sRunIntervalsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunIntervalsQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -200,7 +198,7 @@ public class RunProvider extends ContentProvider {
 
     private Cursor getRunIntervalsWithRun(Uri uri, String[] projection, String sortOrder) {
         String runId = RunContract.RunIntervalEntry.getRunIdFromUri(uri);
-        return sRunIntervalsWithRunQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunIntervalsWithRunQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 sRunIntervalWithRunSelection,
                 new String[]{runId},
@@ -211,7 +209,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
-        return sRunsWithRunTypeQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunsWithRunTypeQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 null,
                 null,
@@ -222,7 +220,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRuns(String[] projection, String sortOrder) {
-        return sRunsQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sRunsQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
                 null,
                 null,
@@ -264,7 +262,7 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final SQLiteDatabase db = new RunDbHelper(getContext()).getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
 
@@ -303,7 +301,7 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final SQLiteDatabase db = new RunDbHelper(getContext()).getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case RUNS:
@@ -386,7 +384,7 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String s, String[] strings) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final SQLiteDatabase db = new RunDbHelper(getContext()).getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
         switch (match) {
@@ -425,7 +423,7 @@ public class RunProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final SQLiteDatabase db = new RunDbHelper(getContext()).getWritableDatabase();
         final int match = sUriMatcher.match(uri);
 
         switch (match) {

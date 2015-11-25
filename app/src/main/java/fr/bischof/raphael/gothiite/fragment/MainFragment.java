@@ -122,13 +122,5 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     public void startLoader() {
         getLoaderManager().initLoader(RUNS_LOADER, null, this);
-        Uri runsWithRunTypeUri = RunContract.RunEntry.buildRunsWithRunTypeUri();
-        String sortOrder = RunContract.RunEntry.COLUMN_START_DATE + " DESC";
-        Cursor cursor = getContext().getContentResolver().query(runsWithRunTypeUri,
-                RUNS_PROJECTION,
-                null,
-                null,
-                sortOrder);
-        String s = "";
     }
 }

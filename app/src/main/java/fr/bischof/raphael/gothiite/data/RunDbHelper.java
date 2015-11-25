@@ -73,6 +73,17 @@ public class RunDbHelper  extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
                 RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
 
+        final String SQL_CREATE_DELETE_TABLE = "CREATE TABLE " + RunContract.RunTypeIntervalEntry.TABLE_NAME + " (" +
+                RunContract.RunTypeIntervalEntry._ID + " TEXT PRIMARY KEY," +
+                RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO + " REAL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " TEXT NOT NULL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_EFFORT + " INTEGER NOT NULL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED + " REAL, " +
+                RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO + " REAL, " +
+                " FOREIGN KEY (" + RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
+                RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
+
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_INTERVAL_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_TYPE_TABLE);

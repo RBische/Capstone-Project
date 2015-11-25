@@ -206,7 +206,7 @@ public class GothiiteSyncAdapter extends AbstractThreadedSyncAdapter {
                 runTypesData.close();
                 for(ParseObject serverObject:runTypes) {
                     if (!localCurrentRunTypesId.contains(serverObject.getString("runTypeId"))){
-                        serverCurrentRunTypesToRetrieveId.add(serverObject.getString("userId"));
+                        serverCurrentRunTypesToRetrieveId.add(serverObject.getString("runTypeId"));
                         ContentValues valuesToSave = new ContentValues();
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_CAN_BE_DELETED,serverObject.getBoolean("canBeDeleted") ? 1 : 0);
                         valuesToSave.put(RunContract.RunTypeEntry.COLUMN_DESCRIPTION,serverObject.getString("description"));

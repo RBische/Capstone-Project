@@ -1,7 +1,7 @@
 package fr.bischof.raphael.gothiite.fragment;
 
 import android.Manifest;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;

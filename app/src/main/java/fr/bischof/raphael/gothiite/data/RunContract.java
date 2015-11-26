@@ -1,7 +1,6 @@
 package fr.bischof.raphael.gothiite.data;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -27,6 +26,7 @@ public class RunContract  {
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_RUN = "run";
+    public static final String PATH_LAST_RUN = "lastrun";
     public static final String PATH_RUN_WITH_RUN_TYPE = "runwithruntype";
     public static final String PATH_RUN_INTERVAL = "runInterval";
     public static final String PATH_RUN_TYPE = "runtype";
@@ -40,6 +40,8 @@ public class RunContract  {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN).build();
         public static final Uri CONTENT_JOINED_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN_WITH_RUN_TYPE).build();
+        public static final Uri CONTENT_LAST_RUN_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LAST_RUN).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN;
@@ -68,6 +70,10 @@ public class RunContract  {
 
         public static String getRunIdFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
+        }
+
+        public static Uri buildLastRunUri() {
+            return CONTENT_LAST_RUN_URI;
         }
     }
 

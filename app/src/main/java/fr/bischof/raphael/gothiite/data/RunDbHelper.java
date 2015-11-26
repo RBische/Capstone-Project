@@ -112,7 +112,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
             ContentValues tabataRunTypeInterval = new ContentValues();
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT, true);
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_ORDER, i);
-            tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID, "IP3Asv0Lq4");
+            tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID, "739c19d4-f987-4c87-a160-6de74017a3d1");
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO, timeToDo[i]);
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO, distanceToDo[i]);
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED, speedEstimated[i]);
@@ -140,7 +140,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
             ContentValues tabataRunTypeInterval = new ContentValues();
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT, effort);
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_ORDER, i);
-            tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID, "NzJfaCp6iY");
+            tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID, "db45f67a-70eb-401d-9e01-4aa42f1220d2");
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO, timeToDo);
             tabataRunTypeInterval.put(RunContract.RunTypeIntervalEntry._ID, UUID.randomUUID().toString());
             sqLiteDatabase.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, tabataRunTypeInterval);

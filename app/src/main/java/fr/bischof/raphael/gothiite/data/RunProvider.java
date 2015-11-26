@@ -16,6 +16,7 @@ public class RunProvider extends ContentProvider {
 
     public static final int RUNS = 100;
     public static final int RUN = 101;
+    public static final int LAST_RUN_WITH_RUN_TYPE = 102;
     public static final int RUNS_WITH_RUN_TYPE = 120;
     public static final int RUN_INTERVALS = 200;
     public static final int RUN_INTERVAL = 201;
@@ -86,6 +87,7 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN, RUNS);
         matcher.addURI(authority, RunContract.PATH_RUN_WITH_RUN_TYPE, RUNS_WITH_RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN + "/*", RUN);
+        matcher.addURI(authority, RunContract.PATH_LAST_RUN , LAST_RUN_WITH_RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL , RUN_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL + "/*", RUN_INTERVAL);
         matcher.addURI(authority, RunContract.PATH_RUN_INTERVAL_WITH_RUN + "/*", RUN_INTERVALS_WITH_RUN);
@@ -126,6 +128,12 @@ public class RunProvider extends ContentProvider {
                 String selectionPrecise = RunContract.RunTypeEntry._ID +"=?";
                 String[] selectionArgsPrecise = new String[]{RunContract.RunTypeEntry.getRunTypeIdFromUri(uri)};
                 retCursor = getRunType(projection,selectionPrecise,selectionArgsPrecise, sortOrder);
+                break;
+            }
+            case LAST_RUN_WITH_RUN_TYPE:
+            {
+                sortOrder = RunContract.RunEntry.COLUMN_START_DATE + " DESC";
+                retCursor = getRunsWithRunType(projection,sortOrder,null,null,1);
                 break;
             }
             case RUN_INTERVALS:
@@ -208,15 +216,20 @@ public class RunProvider extends ContentProvider {
         );
     }
 
-    private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
+    private Cursor getRunsWithRunType(String[] projection, String sortOrder, String selection, String[] selectionArgs, int limit) {
         return sRunsWithRunTypeQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
                 projection,
+                selection,
+                selectionArgs,
                 null,
                 null,
-                null,
-                null,
-                sortOrder
+                sortOrder,
+                limit>0?""+limit:null
         );
+    }
+
+    private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
+        return getRunsWithRunType(projection,sortOrder,null,null,0);
     }
 
     private Cursor getRuns(String[] projection, String sortOrder) {
@@ -240,6 +253,8 @@ public class RunProvider extends ContentProvider {
             case RUNS:
                 return RunContract.RunEntry.CONTENT_TYPE;
             case RUN:
+                return RunContract.RunEntry.CONTENT_ITEM_TYPE;
+            case LAST_RUN_WITH_RUN_TYPE:
                 return RunContract.RunEntry.CONTENT_ITEM_TYPE;
             case RUN_INTERVALS:
                 return RunContract.RunIntervalEntry.CONTENT_TYPE;

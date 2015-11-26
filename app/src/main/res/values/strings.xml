@@ -64,7 +64,7 @@
     <string name="sure_delete_run_type">Are you sure you want to delete this session type ?</string>
     <string name="edit">Edit</string>
     <string name="choose_icon">Choose an icon</string>
-    <string name="title_activity_create_run">CreateRunActivity</string>
+    <string name="title_activity_create_run">New session</string>
     <string name="error_save_user_id">Unable to save the user after connection, please relog.</string>
     <string name="action_wipe_data">Wipe data</string>
     <string name="sure_wipe_data">Are you sure you want to wipe data ?</string>
@@ -74,4 +74,7 @@
     <string name="sample_run_type">Tabata</string>
     <string name="sample_last_speed">vVO2max (last 14 km/h)</string>
     <string name="speed_unit">km/h</string>
+    <string name="last_speed_start">vVO2max</string>
+    <string name="last_speed_mid">last</string>
+    <string name="last_speed_end">km/h</string>
 </resources>

@@ -113,6 +113,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.bischof.raphael.gothiite.activity.SessionTypeActivity" />
         </activity>
+        <activity
+            android:name=".activity.RunActivity"
+            android:label="@string/title_activity_run"
+            android:parentActivityName=".activity.CreateRunActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.bischof.raphael.gothiite.activity.CreateRunActivity" />
+        </activity>
+
+        <service
+            android:name=".service.RunningService"
+            android:exported="false" />
     </application>
 
 </manifest>

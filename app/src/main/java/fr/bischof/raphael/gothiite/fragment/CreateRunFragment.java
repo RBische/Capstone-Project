@@ -1,5 +1,6 @@
 package fr.bischof.raphael.gothiite.fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
@@ -23,6 +24,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.activity.RunActivity;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
@@ -36,6 +38,7 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
             RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO,
             RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO};
+    public static final String EXTRA_VVO2MAX = "ExtraVVO2Max";
     @InjectView(R.id.ivGPS)
     public ImageView mIvGPS;
     @InjectView(R.id.tvRunType)
@@ -144,5 +147,12 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
                 }
             }
         }
+    }
+
+    public void launchSession() {
+        Intent intent = new Intent(getActivity(), RunActivity.class);
+        intent.setData(getActivity().getIntent().getData());
+        intent.putExtra(EXTRA_VVO2MAX, Double.parseDouble(mEtSpeedChoosed.getText().toString()));
+        startActivity(intent);
     }
 }

@@ -2,15 +2,15 @@ package fr.bischof.raphael.gothiite.calculator;
 
 public final class Calculator {
 
-    private static double calculateDistanceNeeded(double time, double vVO2Max, double ie) {
+    public static double calculateDistanceNeeded(double time, double vVO2Max, double ie) {
         return ((ie*Math.log(time/7)+100)*vVO2Max*time)/6;
     }
 
-    private static double calculateVV02max(double time, double distance, double ie) {
+    public static double calculateVV02max(double time, double distance, double ie) {
         return 6*distance/((ie*Math.log(time/7)+100)*time);
     }
 
-    private static double calculateTimeNeeded(double distance, double vVO2Max, double ie) {
+    public static double calculateTimeNeeded(double distance, double vVO2Max, double ie) {
         double time = 1;
         int i =0;
         double result;

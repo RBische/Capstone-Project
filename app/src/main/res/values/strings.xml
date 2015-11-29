@@ -77,4 +77,7 @@
     <string name="last_speed_start">vVO2max</string>
     <string name="last_speed_mid">last</string>
     <string name="last_speed_end">km/h</string>
+    <string name="action_run">Run</string>
+    <string name="title_activity_run">Run</string>
+    <string name="pref_ie">pref_ie</string>
 </resources>

@@ -18,7 +18,7 @@ public class RunTypeInterval implements Parcelable {
         this.effort = effort;
     }
 
-    public boolean getEffort() {
+    public boolean isEffort() {
         return effort;
     }
 

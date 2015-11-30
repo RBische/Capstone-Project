@@ -27,80 +27,47 @@ tools:context="fr.bischof.raphael.gothiite.fragment.RunFragment">
             android:gravity="center_horizontal"
             android:id="@+id/tvRunType" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/gps_signal"
-                android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:gravity="right"/>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:scaleType="centerInside"
-                android:layout_weight="1"
-                android:id="@+id/ivGPS"
-                android:src="@drawable/ic_signal_low"/>
-        </LinearLayout>
-
         <fr.bischof.raphael.gothiite.ui.IntervalView
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="80dp"
             android:layout_marginTop="16dp"
             android:id="@+id/invRunType"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvDescription"
-            tools:text="@string/sample_description"
+            android:id="@+id/tvMetersBeforeNext"
+            tools:text="@string/sample_run_type"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvTimer"
+            tools:text="@string/sample_run_type"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvBefore"
+            tools:text="@string/sample_run_type"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvEffortLeft"
+            tools:text="@string/sample_run_type"
             android:padding="@dimen/activity_horizontal_margin"
             android:gravity="center_horizontal"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvLastSpeed"
-            tools:text="@string/sample_last_speed"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal" />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                >
-                <EditText
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:id="@+id/etSpeedChoosed"
-                    android:inputType="numberSigned"
-                    tools:text="14"/>
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/speed_unit"
-                android:layout_gravity="center_vertical"/>
-        </LinearLayout>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
 </FrameLayout>

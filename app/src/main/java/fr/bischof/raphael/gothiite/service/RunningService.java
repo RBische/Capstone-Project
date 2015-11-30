@@ -6,17 +6,15 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -29,6 +27,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.MainActivity;
@@ -55,7 +55,10 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private GoogleApiClient mGoogleApiClient;
     private boolean mRequestingLocationUpdates = false;
     private Activity mBoundActivity;
+    private OnRunningServiceUpdateListener mBoundListener;
     private ArrayList<RunInterval> mCurrentIntervalsDone = new ArrayList<>();
+    private long mCurrentStartTime;
+    private long mRunStartTime;
 
     @Nullable
     @Override
@@ -74,14 +77,18 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         return super.onUnbind(intent);
     }
 
-    public void loadRun(ArrayList<RunTypeInterval> runIntervals, Activity boundActivity) {
+    public void loadRun(ArrayList<RunTypeInterval> runIntervals, Activity boundActivity,OnRunningServiceUpdateListener listener) {
         this.mRunIntervals = runIntervals;
         this.mRunIntervalsToDo = runIntervals;
         this.mBoundActivity = boundActivity;
+        mBoundListener = listener;
         startRun();
     }
 
     private void startRun() {
+        mCurrentStartTime = System.currentTimeMillis();
+        mRunStartTime = mCurrentStartTime;
+        startTimer();
         mGoogleApiClient = new GoogleApiClient.Builder(getBaseContext())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -90,8 +97,52 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         mGoogleApiClient.connect();
     }
 
+    private void startTimer() {
+        if (mRunIntervalsToDo!=null&&mRunIntervalsToDo.size()>0){
+            if (mBoundListener !=null){
+                RunTypeInterval interval = null;
+                if (mRunIntervalsToDo.size()>1){
+                    interval = mRunIntervalsToDo.get(1);
+                }
+                mBoundListener.onTimerStarted((long)mRunIntervalsToDo.get(0).getTimeToDo(),mRunStartTime,mRunIntervalsToDo.get(0).isEffort(),interval);
+            }
+            CountDownTimer cT =  new CountDownTimer((long) mRunIntervalsToDo.get(0).getTimeToDo() - 200, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+
+                public void onFinish() {
+                    timerEnded();
+                }
+            };
+            cT.start();
+        }else{
+            endRun();
+        }
+    }
+
+    private void timerEnded() {
+        try {
+            long timeToWait = ((long)mRunIntervalsToDo.get(0).getTimeToDo()-System.currentTimeMillis()-mCurrentStartTime);
+            if (timeToWait>0){
+                Thread.sleep(timeToWait);
+            }
+        } catch (InterruptedException e) {
+            //Not a problem if happens
+        }
+        if (mBoundListener !=null){
+            mBoundListener.onTimerEnded();
+        }
+        mRunIntervalsToDo.remove(0);
+        mCurrentStartTime = System.currentTimeMillis();
+        if (mRunIntervalsToDo.size()==0){
+            endRun();
+        }else{
+            startTimer();
+        }
+    }
+
     public boolean isActive() {
-        return mRunIntervalsToDo.size()>0;
+        return mRunIntervalsToDo != null && mRunIntervalsToDo.size() > 0;
     }
 
     public void showNotification() {
@@ -106,9 +157,6 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             Notification notification;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Notification.Builder builder = new Notification.Builder(getApplicationContext())
-                        .setStyle(new Notification.MediaStyle()
-                                // Show our playback controls in the compat view
-                                .setShowActionsInCompactView(0, 1, 2))
                         .setContentText("" + (currentInterval.getTimeToDo() / 1000) + "")
                         .setContentTitle(getApplicationContext().getString(R.string.now_running))
                         .setContentIntent(pi);

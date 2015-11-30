@@ -18,10 +18,17 @@ import java.util.List;
 public class IntervalView extends View {
     private Paint paintGreen;
     private Paint paintRed;
+    private Paint paintGray;
+    private int mTimeFromBeginning = 0;
     private int parentHeight;
     private int parentWidth;
     private List<ColorPart> partsToDraw;
     private int summedSize;
+
+    public void setTimeFromBeginning(int timeFromBeginning) {
+        this.mTimeFromBeginning = timeFromBeginning;
+        invalidate();
+    }
 
     public IntervalView(Context context) {
         super(context);
@@ -48,6 +55,10 @@ public class IntervalView extends View {
         // create the Paint and set its color
         paintRed = new Paint();
         paintRed.setColor(Color.RED);
+        // create the Paint and set its color
+        paintGray = new Paint();
+        paintGray.setColor(Color.GRAY);
+        paintGray.setAlpha(100);
     }
 
     @Override
@@ -74,6 +85,8 @@ public class IntervalView extends View {
             }
             x+=rectangleWidth;
         }
+        int grayRectangleWidth = parentWidth*mTimeFromBeginning/summedSize;
+        canvas.drawRect(new Rect(0, 0, grayRectangleWidth, parentHeight), paintGray);
     }
 
     /**

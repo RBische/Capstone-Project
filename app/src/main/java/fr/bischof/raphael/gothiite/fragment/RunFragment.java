@@ -1,11 +1,13 @@
 package fr.bischof.raphael.gothiite.fragment;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -13,18 +15,24 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.calculator.Calculator;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
+import fr.bischof.raphael.gothiite.service.OnRunningServiceUpdateListener;
 import fr.bischof.raphael.gothiite.service.RunningService;
 import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
@@ -32,7 +40,7 @@ import fr.bischof.raphael.gothiite.ui.IntervalView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class RunFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class RunFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnRunningServiceUpdateListener {
     private static final int RUN_TYPE_LOADER = 1;
     private static final String[] RUN_TYPE_INTERVALS_PROJECTION = {RunContract.RunTypeIntervalEntry._ID,
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
@@ -40,8 +48,14 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO};
     private static final String EXTRA_RUN_INTERVALS = "RunIntervalsSaved";
     private static final String EXTRA_RUN_INTERVALS_TO_DO = "RunIntervalsToDo";
+    @InjectView(R.id.tvRunType)
+    public TextView mTvRunType;
     @InjectView(R.id.invRunType)
     public IntervalView mInvRunType;
+    @InjectView(R.id.tvTimer)
+    public TextView mTvTimer;
+    @InjectView(R.id.tvBefore)
+    public TextView mTvBefore;
     private double mVVO2max = 0;
     private ArrayList<RunTypeInterval> mRunIntervals;
     private ArrayList<RunTypeInterval> mRunIntervalsToDo;
@@ -61,7 +75,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ButterKnife.inject(this, view);
         if (savedInstanceState==null){
             if(getActivity().getIntent().getData()==null){
                 mNeedsToRefreshFromService = true;
@@ -71,6 +85,17 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
         }else{
             this.mRunIntervals = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS);
             this.mRunIntervalsToDo = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS_TO_DO);
+        }
+        //TODO: Fill tvRunType
+        if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
+            Toolbar toolbar = (Toolbar)view.findViewById(R.id.toolbar);
+            ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+            ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+            if (actionBar!=null){
+                actionBar.setSubtitle(null);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowHomeEnabled(true);
+            }
         }
     }
 
@@ -118,7 +143,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     private void fillUI(){
         List<ColorPart> partsToDraw = new ArrayList<>();
         for(RunTypeInterval interval:mRunIntervals) {
-            boolean effort = interval.getEffort();
+            boolean effort = interval.isEffort();
             double time = interval.getTimeToDo();
             double distance = interval.getDistanceToDo();
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -140,6 +165,13 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Intent intent = new Intent(getActivity(), RunningService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -159,7 +191,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                 mRunIntervalsToDo = mService.getRunIntervalsToDo();
                 fillUI();
             }else {
-                mService.loadRun(mRunIntervals,getActivity());
+                mService.loadRun(mRunIntervals, getActivity(), RunFragment.this);
             }
             mService.hideNotification();
             mBound = true;
@@ -184,5 +216,37 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             getActivity().unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    public void onTimerEnded() {
+
+    }
+
+    @Override
+    public void onTimerStarted(long duration,final long timeStartRun, boolean effort, final RunTypeInterval nextRunTypeInterval) {
+        CountDownTimer cT =  new CountDownTimer(duration, 50) {
+            public void onTick(long millisUntilFinished) {
+                String nextRunType = getString(R.string.before_stop);
+                if (nextRunTypeInterval!=null){
+                    if(nextRunTypeInterval.isEffort()){
+                        nextRunType = getString(R.string.before_effort);
+                    }else{
+                        nextRunType = getString(R.string.before_rest);
+                    }
+                }
+                mTvBefore.setText(nextRunType);
+                String v = String.format("%02d", millisUntilFinished/60000);
+                //String timeSinceStart = String.format("%02d", (System.currentTimeMillis()-timeStartRun)/1000);
+                mInvRunType.setTimeFromBeginning((int)(System.currentTimeMillis()-timeStartRun));
+                int va = (int)( (millisUntilFinished%60000)/1000);
+                mTvTimer.setText(v + ":" + String.format("%02d", va) + " seconds remaining");
+            }
+
+            public void onFinish() {
+                mTvTimer.setText("done!");
+            }
+        };
+        cT.start();
     }
 }

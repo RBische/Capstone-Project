@@ -81,4 +81,7 @@
     <string name="title_activity_run">Run</string>
     <string name="pref_ie">pref_ie</string>
     <string name="now_running">Current running session</string>
+    <string name="before_stop">before stop</string>
+    <string name="before_effort">before effort</string>
+    <string name="before_rest">before rest</string>
 </resources>

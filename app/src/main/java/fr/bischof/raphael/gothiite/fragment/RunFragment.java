@@ -1,8 +1,12 @@
 package fr.bischof.raphael.gothiite.fragment;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -21,6 +25,7 @@ import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.calculator.Calculator;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
+import fr.bischof.raphael.gothiite.service.RunningService;
 import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
 
@@ -33,9 +38,16 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             RunContract.RunTypeIntervalEntry.COLUMN_EFFORT,
             RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO,
             RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO};
+    private static final String EXTRA_RUN_INTERVALS = "RunIntervalsSaved";
+    private static final String EXTRA_RUN_INTERVALS_TO_DO = "RunIntervalsToDo";
     @InjectView(R.id.invRunType)
     public IntervalView mInvRunType;
     private double mVVO2max = 0;
+    private ArrayList<RunTypeInterval> mRunIntervals;
+    private ArrayList<RunTypeInterval> mRunIntervalsToDo;
+    private RunningService mService;
+    private boolean mBound = false;
+    private boolean mNeedsToRefreshFromService = false;
 
     public RunFragment() {
     }
@@ -49,7 +61,17 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
+
+        if (savedInstanceState==null){
+            if(getActivity().getIntent().getData()==null){
+                mNeedsToRefreshFromService = true;
+            }else{
+                getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
+            }
+        }else{
+            this.mRunIntervals = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS);
+            this.mRunIntervalsToDo = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS_TO_DO);
+        }
     }
 
     /*difficulté des séances en fonction du nombre de période de run
@@ -74,8 +96,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        ArrayList<RunTypeInterval> runIntervals = new ArrayList<>();
-        List<ColorPart> partsToDraw = new ArrayList<>();
+        mRunIntervals = new ArrayList<>();
         while (data.moveToNext()) {
             boolean effort = data.getInt(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
             double time = data.getDouble(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
@@ -87,17 +108,81 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             if (time==0){
                 time = Calculator.calculateTimeNeeded(distance,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
             }
+            mRunIntervals.add(new RunTypeInterval(time, distance, effort));
+        }
+        mRunIntervalsToDo=mRunIntervals;
+        data.moveToFirst();
+        fillUI();
+    }
+
+    private void fillUI(){
+        List<ColorPart> partsToDraw = new ArrayList<>();
+        for(RunTypeInterval interval:mRunIntervals) {
+            boolean effort = interval.getEffort();
+            double time = interval.getTimeToDo();
+            double distance = interval.getDistanceToDo();
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            if (distance==0){
+                distance = Calculator.calculateDistanceNeeded(time,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
+            }
+            if (time==0){
+                time = Calculator.calculateTimeNeeded(distance,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
+            }
             int timeInSec = (int)time;
             ColorPart part = new ColorPart(timeInSec,!effort);
-            runIntervals.add(new RunTypeInterval(time,distance,effort));
             partsToDraw.add(part);
         }
         mInvRunType.updateParts(partsToDraw);
-        data.moveToFirst();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to StreamerBinder, cast the IBinder and get StreamerBinder instance
+            RunningService.RunningBinder binder = (RunningService.RunningBinder) service;
+            mService = binder.getService();
+            //The intent is here only to make the bound service persistent
+            Intent intent = new Intent(getActivity(), RunningService.class);
+            intent.setAction(RunningService.ACTION_STAY_AWAKE);
+            getActivity().startService(intent);
+            if(mNeedsToRefreshFromService){
+                mRunIntervals = mService.getRunIntervals();
+                mRunIntervalsToDo = mService.getRunIntervalsToDo();
+                fillUI();
+            }else {
+                mService.loadRun(mRunIntervals,getActivity());
+            }
+            mService.hideNotification();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mBound) {
+            if (mService.isActive()){
+                mService.showNotification();
+            }else{
+                mService.stopSelf();
+            }
+            getActivity().unbindService(mConnection);
+            mBound = false;
+        }
     }
 }

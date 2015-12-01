@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.fragment.RunFragment;
 
 public class RunActivity extends AppCompatActivity {
 
@@ -25,16 +26,20 @@ public class RunActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        //TODO: Create alert dialog to confirm quit
+        if (id == R.id.action_stop){
+            if (getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof RunFragment){
+                RunFragment fragment = (RunFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+                fragment.stopRun();
+                finish();
+            }
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //TODO: Ask sure if want to quit run
     }
 }

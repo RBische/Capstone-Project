@@ -58,7 +58,7 @@ public class IntervalView extends View {
         // create the Paint and set its color
         paintGray = new Paint();
         paintGray.setColor(Color.GRAY);
-        paintGray.setAlpha(100);
+        paintGray.setAlpha(150);
     }
 
     @Override

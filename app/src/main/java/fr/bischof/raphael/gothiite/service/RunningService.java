@@ -32,6 +32,7 @@ import java.util.TimerTask;
 
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.MainActivity;
+import fr.bischof.raphael.gothiite.activity.RunActivity;
 import fr.bischof.raphael.gothiite.model.RunInterval;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
 
@@ -59,6 +60,8 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private ArrayList<RunInterval> mCurrentIntervalsDone = new ArrayList<>();
     private long mCurrentStartTime;
     private long mRunStartTime;
+    private String mCurrentRunTypeName;
+    private boolean mLoaded = false;
 
     @Nullable
     @Override
@@ -77,12 +80,22 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         return super.onUnbind(intent);
     }
 
-    public void loadRun(ArrayList<RunTypeInterval> runIntervals, Activity boundActivity,OnRunningServiceUpdateListener listener) {
+    public void loadRun(ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, Activity boundActivity, OnRunningServiceUpdateListener listener) {
         this.mRunIntervals = runIntervals;
         this.mRunIntervalsToDo = runIntervals;
         this.mBoundActivity = boundActivity;
-        mBoundListener = listener;
+        this.mCurrentRunTypeName = currentRunTypeName;
+        this.mBoundListener = listener;
+        this.mLoaded = true;
         startRun();
+    }
+
+    public boolean isLoaded() {
+        return mLoaded;
+    }
+
+    public void setOnRunningServiceUpdateListener(OnRunningServiceUpdateListener listener) {
+        this.mBoundListener = listener;
     }
 
     private void startRun() {
@@ -133,6 +146,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             mBoundListener.onTimerEnded();
         }
         mRunIntervalsToDo.remove(0);
+        mCurrentDistanceInInterval = 0;
         mCurrentStartTime = System.currentTimeMillis();
         if (mRunIntervalsToDo.size()==0){
             endRun();
@@ -148,7 +162,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     public void showNotification() {
         if (mRunIntervalsToDo.size()>0){
             RunTypeInterval currentInterval = mRunIntervalsToDo.get(0);
-            Intent intentStreamingUI = new Intent(getBaseContext(), MainActivity.class);
+            Intent intentStreamingUI = new Intent(getBaseContext(), RunActivity.class);
             intentStreamingUI.setAction(ACTION_SHOW_UI_FROM_RUN);
             intentStreamingUI.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0,
@@ -194,10 +208,10 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
 
     public void endRun(){
         if(mNotificationShown){
-            stopLocationUpdates();
             hideNotification();
-            stopSelf();
         }
+        stopLocationUpdates();
+        stopSelf();
     }
 
     public ArrayList<RunTypeInterval> getRunIntervalsToDo() {
@@ -234,11 +248,31 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     }
 
     protected void stopLocationUpdates() {
-        if (mGoogleApiClient.isConnected() ) {
+        if (mGoogleApiClient!=null&&mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mGoogleApiClient, this);
         }
         mRequestingLocationUpdates = false;
+    }
+
+    public String getCurrentRunTypeName() {
+        return mCurrentRunTypeName;
+    }
+
+    public double getDistanceRemaining() {
+        if (mRunIntervalsToDo.size()>0){
+            return mRunIntervalsToDo.get(0).getDistanceToDo() - mCurrentDistanceInInterval;
+        }else{
+            return 0;
+        }
+    }
+
+    public double getDistanceRemainingInRun() {
+        double distanceRemaining = 0;
+        for(RunTypeInterval interval:mRunIntervalsToDo){
+            distanceRemaining += interval.getDistanceToDo();
+        }
+        return distanceRemaining - mCurrentDistanceInInterval;
     }
 
     /**
@@ -264,9 +298,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             // Should we show an explanation?
             if (!ActivityCompat.shouldShowRequestPermissionRationale(mBoundActivity,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-
                 // No explanation needed, we can request the permission.
-
                 ActivityCompat.requestPermissions(mBoundActivity,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_FINE_LOCATION);

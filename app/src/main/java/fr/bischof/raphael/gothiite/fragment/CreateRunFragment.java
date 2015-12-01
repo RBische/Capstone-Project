@@ -61,6 +61,10 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         return inflater.inflate(R.layout.fragment_create_run, container, false);
     }
 
+    /*difficulté des séances en fonction du nombre de période de run
+
+    ajouter niveau de difficulté des séances*/
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

@@ -3,5 +3,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="fr.bischof.raphael.gothiite.activity.CreateRunActivity">
     <item android:id="@+id/action_run" android:title="@string/action_run"
-        android:orderInCategory="100" app:showAsAction="never" />
+        android:orderInCategory="100" app:showAsAction="always" />
 </menu>

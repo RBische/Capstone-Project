@@ -82,14 +82,17 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
             cursorLastRun.close();
         }
         mTvLastSpeed.setText(txtLastSpeed);
-        Cursor cursorRunType = getActivity().getContentResolver().query(currentUri, new String[]{RunContract.RunTypeEntry.COLUMN_NAME, RunContract.RunTypeEntry.COLUMN_DESCRIPTION}, null, null, null);
-        if (cursorRunType!=null){
-            if (cursorRunType.getCount()>0){
-                cursorRunType.moveToFirst();
-                mTvRunType.setText(cursorRunType.getString(cursorRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
-                mTvDescription.setText(cursorRunType.getString(cursorRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+        if (currentUri!=null){
+            Cursor cursorRunType = getActivity().getContentResolver().query(currentUri, new String[]{RunContract.RunTypeEntry.COLUMN_NAME, RunContract.RunTypeEntry.COLUMN_DESCRIPTION}, null, null, null);
+            if (cursorRunType!=null){
+                if (cursorRunType.getCount()>0){
+                    cursorRunType.moveToFirst();
+                    mTvRunType.setText(cursorRunType.getString(cursorRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME)));
+                    mTvDescription.setText(cursorRunType.getString(cursorRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_DESCRIPTION)));
+                }
+                cursorRunType.close();
             }
-            cursorRunType.close();
+            getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
         }
         if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
             Toolbar toolbar = (Toolbar)view.findViewById(R.id.toolbar);
@@ -101,7 +104,6 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
                 actionBar.setDisplayShowHomeEnabled(true);
             }
         }
-        getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
     }
 
     @Override

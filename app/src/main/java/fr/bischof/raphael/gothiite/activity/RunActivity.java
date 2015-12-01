@@ -1,5 +1,7 @@
 package fr.bischof.raphael.gothiite.activity;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,19 +29,37 @@ public class RunActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //TODO: Create alert dialog to confirm quit
         if (id == R.id.action_stop){
-            if (getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof RunFragment){
-                RunFragment fragment = (RunFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                fragment.stopRun();
-                finish();
-            }
+            quitRun(true);
+        }else if (id == android.R.id.home){
+            quitRun(false);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void quitRun(final boolean withSave) {
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment) instanceof RunFragment){
+            final RunFragment fragment = (RunFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            fragment.stopRun(withSave);
+                            finish();
+                            break;
+                    }
+                }
+            };
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.sure_stop_run)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                    .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+        }
+    }
+
     @Override
     public void onBackPressed() {
-        //TODO: Ask sure if want to quit run
+        quitRun(false);
     }
 }

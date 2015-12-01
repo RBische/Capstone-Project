@@ -7,6 +7,7 @@ import fr.bischof.raphael.gothiite.model.RunTypeInterval;
  * Created by biche on 30/11/2015.
  */
 public interface OnRunningServiceUpdateListener {
+    void onRunFinished();
     void onTimerEnded();
     void onTimerStarted(long duration, long timeStartRun, boolean effort, RunTypeInterval nextRunTypeInterval);
 }

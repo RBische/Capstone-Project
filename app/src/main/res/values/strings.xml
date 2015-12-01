@@ -85,4 +85,6 @@
     <string name="before_effort">before effort</string>
     <string name="before_rest">before rest</string>
     <string name="action_stop">Stop</string>
+    <string name="sure_stop_run">Are you sure you want to stop this session ?</string>
+    <string name="left">left</string>
 </resources>

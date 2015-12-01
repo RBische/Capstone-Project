@@ -6,10 +6,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,12 +29,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.UUID;
 
 import fr.bischof.raphael.gothiite.R;
-import fr.bischof.raphael.gothiite.activity.MainActivity;
 import fr.bischof.raphael.gothiite.activity.RunActivity;
+import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunInterval;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
 
@@ -62,6 +63,9 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private long mRunStartTime;
     private String mCurrentRunTypeName;
     private boolean mLoaded = false;
+    private Location mStartPosition;
+    private Location mEndPosition;
+    private String mRunTypeId;
 
     @Nullable
     @Override
@@ -80,7 +84,8 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         return super.onUnbind(intent);
     }
 
-    public void loadRun(ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, Activity boundActivity, OnRunningServiceUpdateListener listener) {
+    public void loadRun(String runTypeId, ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, Activity boundActivity, OnRunningServiceUpdateListener listener) {
+        this.mRunTypeId = runTypeId;
         this.mRunIntervals = runIntervals;
         this.mRunIntervalsToDo = runIntervals;
         this.mBoundActivity = boundActivity;
@@ -111,6 +116,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     }
 
     private void startTimer() {
+        //TODO: generate sounds and vibrations
         if (mRunIntervalsToDo!=null&&mRunIntervalsToDo.size()>0){
             if (mBoundListener !=null){
                 RunTypeInterval interval = null;
@@ -119,8 +125,14 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
                 }
                 mBoundListener.onTimerStarted((long)mRunIntervalsToDo.get(0).getTimeToDo(),mRunStartTime,mRunIntervalsToDo.get(0).isEffort(),interval);
             }
+            if(mNotificationShown){
+                showNotification();
+            }
             CountDownTimer cT =  new CountDownTimer((long) mRunIntervalsToDo.get(0).getTimeToDo() - 200, 1000) {
                 public void onTick(long millisUntilFinished) {
+                    if (mNotificationShown){
+                        showNotification();
+                    }
                 }
 
                 public void onFinish() {
@@ -129,7 +141,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             };
             cT.start();
         }else{
-            endRun();
+            endRun(true);
         }
     }
 
@@ -145,11 +157,16 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (mBoundListener !=null){
             mBoundListener.onTimerEnded();
         }
+        if (mRunIntervalsToDo.get(0).isEffort()){
+            mCurrentIntervalsDone.add(new RunInterval(mCurrentDistanceInInterval,mCurrentStartTime,System.currentTimeMillis(),mStartPosition,mEndPosition));
+        }
         mRunIntervalsToDo.remove(0);
         mCurrentDistanceInInterval = 0;
+        mStartPosition = null;
+        mEndPosition = null;
         mCurrentStartTime = System.currentTimeMillis();
         if (mRunIntervalsToDo.size()==0){
-            endRun();
+            endRun(true);
         }else{
             startTimer();
         }
@@ -165,27 +182,26 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             Intent intentStreamingUI = new Intent(getBaseContext(), RunActivity.class);
             intentStreamingUI.setAction(ACTION_SHOW_UI_FROM_RUN);
             intentStreamingUI.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            //TODO: Edit to follow app breadcrumb
             PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0,
                     intentStreamingUI,
                     PendingIntent.FLAG_CANCEL_CURRENT);
             Notification notification;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Notification.Builder builder = new Notification.Builder(getApplicationContext())
-                        .setContentText("" + (currentInterval.getTimeToDo() / 1000) + "")
-                        .setContentTitle(getApplicationContext().getString(R.string.now_running))
-                        .setContentIntent(pi);
-                //TODO: Replace that icon
-                builder.setSmallIcon(R.drawable.ic_cast_dark);
+                        .setContentText(String.format("%02d", (((long)currentInterval.getTimeToDo() - (System.currentTimeMillis() - mCurrentStartTime)) / 1000)) + "s " + getBaseContext().getString(R.string.left))
+                                .setContentTitle(getApplicationContext().getString(R.string.now_running))
+                                .setContentIntent(pi);
+                builder.setSmallIcon(R.drawable.icon_notification);
                 builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
                 notification = builder.build();
             }else{
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
-                        .setContentText("" + (currentInterval.getTimeToDo() / 1000) + "")
-                        .setContentTitle(getApplicationContext().getString(R.string.now_running))
-                        .setContentIntent(pi);
+                        .setContentText(String.format("%02d", (((long)currentInterval.getTimeToDo() - (System.currentTimeMillis() - mCurrentStartTime)) / 1000)) + "s " + getBaseContext().getString(R.string.left))
+                                .setContentTitle(getApplicationContext().getString(R.string.now_running))
+                                .setContentIntent(pi);
                 builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                //TODO: Replace that icon
-                builder.setSmallIcon(R.drawable.ic_cast_dark);
+                builder.setSmallIcon(R.drawable.icon_notification);
                 notification = builder.build();
             }
             notification.tickerText = getApplicationContext().getString(R.string.now_running);
@@ -206,16 +222,49 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         mNotificationShown = false;
     }
 
-    public void endRun(){
+    public void endRun(boolean withSave){
+        if (withSave){
+            //Preparing Run to save
+            UUID runId = UUID.randomUUID();
+            String runTypeId = mRunTypeId;
+            //TODO: Calculate avg_speed & vvo2max equivalent
+            Uri runsUri = RunContract.RunEntry.buildRunsUri();
+            ArrayList<ContentValues> runsToSave = new ArrayList<>();
+            ContentValues valuesToSaveForRun = new ContentValues();
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_AVG_SPEED, 0);
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_RUN_TYPE_ID, runTypeId);
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_START_DATE, mRunStartTime);
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT, 0);
+            valuesToSaveForRun.put(RunContract.RunEntry._ID, runId.toString());
+            runsToSave.add(valuesToSaveForRun);
+            getBaseContext().getContentResolver().bulkInsert(runsUri, runsToSave.toArray(new ContentValues[runsToSave.size()]));
+            Uri runIntervalsUri = RunContract.RunIntervalEntry.buildRunIntervalsUri();
+            ArrayList<ContentValues> runIntervalsToSave = new ArrayList<>();
+            int i=0;
+            for(RunInterval interval:mCurrentIntervalsDone){
+                //Preparing RunIntervals to save
+                ContentValues valuesToSave = new ContentValues();
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE,interval.getDistanceDone());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_DATE,interval.getEndTime());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LATITUDE,interval.getEndPosition().getLatitude());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE,interval.getEndPosition().getLongitude());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_ORDER, i);
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_RUN_ID, runId.toString());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_DATE, interval.getStartTime());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LATITUDE, interval.getStartPosition().getLatitude());
+                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE, interval.getStartPosition().getLongitude());
+                valuesToSave.put(RunContract.RunIntervalEntry._ID, UUID.randomUUID().toString());
+                runIntervalsToSave.add(valuesToSave);
+                i++;
+            }
+            getBaseContext().getContentResolver().bulkInsert(runIntervalsUri, runIntervalsToSave.toArray(new ContentValues[runIntervalsToSave.size()]));
+            mBoundListener.onRunFinished();
+        }
         if(mNotificationShown){
             hideNotification();
         }
         stopLocationUpdates();
         stopSelf();
-    }
-
-    public ArrayList<RunTypeInterval> getRunIntervalsToDo() {
-        return mRunIntervalsToDo;
     }
 
     public ArrayList<RunTypeInterval> getRunIntervals() {
@@ -239,6 +288,10 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (mLastLocationOfInterval!=null){
             mCurrentDistanceInInterval += mLastLocationOfInterval.distanceTo(location);
         }
+        if (mStartPosition==null){
+            mStartPosition = location;
+        }
+        mEndPosition = location;
         mLastLocationOfInterval = location;
     }
 
@@ -273,6 +326,18 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             distanceRemaining += interval.getDistanceToDo();
         }
         return distanceRemaining - mCurrentDistanceInInterval;
+    }
+
+    public void forceRefresh() {
+        if (mRunIntervalsToDo!=null&&mRunIntervalsToDo.size()>0) {
+            if (mBoundListener != null) {
+                RunTypeInterval interval = null;
+                if (mRunIntervalsToDo.size() > 1) {
+                    interval = mRunIntervalsToDo.get(1);
+                }
+                mBoundListener.onTimerStarted((long) mRunIntervalsToDo.get(0).getTimeToDo()-(System.currentTimeMillis()-mCurrentStartTime), mRunStartTime, mRunIntervalsToDo.get(0).isEffort(), interval);
+            }
+        }
     }
 
     /**

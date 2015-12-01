@@ -50,7 +50,6 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     private static final String[] RUN_TYPE_PROJECTION = {RunContract.RunTypeEntry._ID,
             RunContract.RunTypeEntry.COLUMN_NAME};
     private static final String EXTRA_RUN_INTERVALS = "RunIntervalsSaved";
-    private static final String EXTRA_RUN_INTERVALS_TO_DO = "RunIntervalsToDo";
     @InjectView(R.id.tvRunType)
     public TextView mTvRunType;
     @InjectView(R.id.invRunType)
@@ -66,10 +65,10 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     private double mVVO2max = 0;
     private String mCurrentRunTypeName;
     private ArrayList<RunTypeInterval> mRunIntervals;
-    private ArrayList<RunTypeInterval> mRunIntervalsToDo;
     private RunningService mService;
     private boolean mBound = false;
     private boolean mNeedsToRefreshFromService = false;
+    private String mRunTypeId;
 
     public RunFragment() {
     }
@@ -90,15 +89,17 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             }else{
                 mVVO2max = getActivity().getIntent().getDoubleExtra(CreateRunFragment.EXTRA_VVO2MAX,0);
                 Cursor currentRunType = getActivity().getContentResolver().query(getActivity().getIntent().getData(),RUN_TYPE_PROJECTION,null,null,null);
-                currentRunType.moveToFirst();
-                if (!currentRunType.isAfterLast()){
-                    mCurrentRunTypeName = currentRunType.getString(currentRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME));
+                if (currentRunType!=null){
+                    currentRunType.moveToFirst();
+                    if (!currentRunType.isAfterLast()){
+                        mCurrentRunTypeName = currentRunType.getString(currentRunType.getColumnIndex(RunContract.RunTypeEntry.COLUMN_NAME));
+                    }
+                    currentRunType.close();
                 }
                 getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
             }
         }else{
             this.mRunIntervals = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS);
-            this.mRunIntervalsToDo = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS_TO_DO);
         }
         if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
             Toolbar toolbar = (Toolbar)view.findViewById(R.id.toolbar);
@@ -116,12 +117,12 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = RunContract.RunTypeIntervalEntry.TABLE_NAME+"."+RunContract.RunTypeIntervalEntry.COLUMN_ORDER + " ASC";
         Uri uri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
-        String runTypeId = RunContract.RunTypeEntry.getRunTypeIdFromUri(getActivity().getIntent().getData());
+        mRunTypeId = RunContract.RunTypeEntry.getRunTypeIdFromUri(getActivity().getIntent().getData());
         return new CursorLoader(getActivity(),
                 uri,
                 RUN_TYPE_INTERVALS_PROJECTION,
                 RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + "= ?",
-                new String[]{runTypeId},
+                new String[]{mRunTypeId},
                 sortOrder);
     }
 
@@ -133,6 +134,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             double time = data.getDouble(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
             double distance = data.getDouble(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO));
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            //TODO: weight the distances/durations with the difficulty of the session
             if (distance==0&&effort){
                 distance = Calculator.calculateDistanceNeeded(time,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
             }
@@ -141,9 +143,8 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             }
             mRunIntervals.add(new RunTypeInterval(time, distance, effort));
         }
-        mRunIntervalsToDo=mRunIntervals;
         if(mService!=null&&!mService.isLoaded()){
-            mService.loadRun(mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
+            mService.loadRun(mRunTypeId,mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
         }
         data.moveToFirst();
         fillUI();
@@ -157,9 +158,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             double time = interval.getTimeToDo();
             double distance = interval.getDistanceToDo();
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            if (distance==0){
-                distance = Calculator.calculateDistanceNeeded(time,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
-            }
+            //TODO: weight the distances/durations with the difficulty of the session
             if (time==0){
                 time = Calculator.calculateTimeNeeded(distance,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
             }
@@ -198,14 +197,13 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             getActivity().startService(intent);
             if(mNeedsToRefreshFromService){
                 mRunIntervals = mService.getRunIntervals();
-                mRunIntervalsToDo = mService.getRunIntervalsToDo();
                 mCurrentRunTypeName = mService.getCurrentRunTypeName();
                 fillUI();
                 mService.setOnRunningServiceUpdateListener(RunFragment.this);
-                //TODO: Update currenttextviews
+                mService.forceRefresh();
             }else {
                 if (mRunIntervals!=null){
-                    mService.loadRun(mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
+                    mService.loadRun(mRunTypeId, mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
                 }
             }
             mService.hideNotification();
@@ -233,6 +231,11 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
     }
 
     @Override
+    public void onRunFinished() {
+        getActivity().finish();
+    }
+
+    @Override
     public void onTimerEnded() {
 
     }
@@ -256,7 +259,6 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                     mTvBefore.setText(nextRunType);
                     mTvEffortLeft.setText("" + df.format(mService.getDistanceRemainingInRun()) + " meters left");
                     String v = String.format("%02d", millisUntilFinished/60000);
-                    //String timeSinceStart = String.format("%02d", (System.currentTimeMillis()-timeStartRun)/1000);
                     mInvRunType.setTimeFromBeginning((int)(System.currentTimeMillis()-timeStartRun));
                     int va = (int)( (millisUntilFinished%60000)/1000);
                     mTvTimer.setText(v + ":" + String.format("%02d", va) + " seconds remaining");
@@ -264,17 +266,14 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             }
 
             public void onFinish() {
-                if (getActivity()!=null){
-                    //mTvTimer.setText("done!");
-                }
             }
         };
         cT.start();
     }
 
-    public void stopRun() {
+    public void stopRun(boolean withSave) {
         if (mService!=null){
-            mService.endRun();
+            mService.endRun(withSave);
         }
     }
 }

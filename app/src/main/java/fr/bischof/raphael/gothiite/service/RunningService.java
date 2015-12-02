@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.activity.MainActivity;
 import fr.bischof.raphael.gothiite.activity.RunActivity;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunInterval;
@@ -44,6 +45,7 @@ import fr.bischof.raphael.gothiite.model.RunTypeInterval;
 public class RunningService extends Service implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static final String ACTION_STAY_AWAKE = "ActionToForceServiceToStayAwake";
     public static final String ACTION_SHOW_UI_FROM_RUN = "ShowUIFromRun";
+    public static final String EXTRA_VVO2MAX = "ExtraVvo2max";
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private static final int NOTIFICATION_ID = 1;
     // Binder given to clients
@@ -66,6 +68,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private Location mStartPosition;
     private Location mEndPosition;
     private String mRunTypeId;
+    private double mVVO2max;
 
     @Nullable
     @Override
@@ -84,7 +87,8 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         return super.onUnbind(intent);
     }
 
-    public void loadRun(String runTypeId, ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, Activity boundActivity, OnRunningServiceUpdateListener listener) {
+    public void loadRun(String runTypeId, ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, double vVO2max, Activity boundActivity, OnRunningServiceUpdateListener listener) {
+        this.mVVO2max = vVO2max;
         this.mRunTypeId = runTypeId;
         this.mRunIntervals = runIntervals;
         this.mRunIntervalsToDo = runIntervals;
@@ -179,10 +183,10 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     public void showNotification() {
         if (mRunIntervalsToDo.size()>0){
             RunTypeInterval currentInterval = mRunIntervalsToDo.get(0);
-            Intent intentStreamingUI = new Intent(getBaseContext(), RunActivity.class);
+            Intent intentStreamingUI = new Intent(getBaseContext(), MainActivity.class);
             intentStreamingUI.setAction(ACTION_SHOW_UI_FROM_RUN);
             intentStreamingUI.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            //TODO: Edit to follow app breadcrumb
+            intentStreamingUI.putExtra(EXTRA_VVO2MAX,mVVO2max);
             PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0,
                     intentStreamingUI,
                     PendingIntent.FLAG_CANCEL_CURRENT);
@@ -192,6 +196,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
                         .setContentText(String.format("%02d", (((long)currentInterval.getTimeToDo() - (System.currentTimeMillis() - mCurrentStartTime)) / 1000)) + "s " + getBaseContext().getString(R.string.left))
                                 .setContentTitle(getApplicationContext().getString(R.string.now_running))
                                 .setContentIntent(pi);
+                //TODO: Add icon notification in git
                 builder.setSmallIcon(R.drawable.icon_notification);
                 builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
                 notification = builder.build();
@@ -246,13 +251,17 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
                 ContentValues valuesToSave = new ContentValues();
                 valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE,interval.getDistanceDone());
                 valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_DATE,interval.getEndTime());
-                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LATITUDE,interval.getEndPosition().getLatitude());
-                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE,interval.getEndPosition().getLongitude());
+                if (interval.getEndPosition()!=null){
+                    valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LATITUDE,interval.getEndPosition().getLatitude());
+                    valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_END_POSITION_LONGITUDE,interval.getEndPosition().getLongitude());
+                }
                 valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_ORDER, i);
                 valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_RUN_ID, runId.toString());
                 valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_DATE, interval.getStartTime());
-                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LATITUDE, interval.getStartPosition().getLatitude());
-                valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE, interval.getStartPosition().getLongitude());
+                if (interval.getStartPosition()!=null){
+                    valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LATITUDE, interval.getStartPosition().getLatitude());
+                    valuesToSave.put(RunContract.RunIntervalEntry.COLUMN_START_POSITION_LONGITUDE, interval.getStartPosition().getLongitude());
+                }
                 valuesToSave.put(RunContract.RunIntervalEntry._ID, UUID.randomUUID().toString());
                 runIntervalsToSave.add(valuesToSave);
                 i++;

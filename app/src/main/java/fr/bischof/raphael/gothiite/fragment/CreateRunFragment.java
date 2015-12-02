@@ -26,6 +26,7 @@ import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.RunActivity;
 import fr.bischof.raphael.gothiite.data.RunContract;
+import fr.bischof.raphael.gothiite.service.RunningService;
 import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
 
@@ -71,15 +72,19 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         ButterKnife.inject(this, view);
         Uri currentUri  = getActivity().getIntent().getData();
         String txtLastSpeed = getString(R.string.last_speed_start);
-        Cursor cursorLastRun = getActivity().getContentResolver().query(RunContract.RunEntry.buildLastRunUri(), new String[]{RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT}, null, null, null);
-        if (cursorLastRun!=null){
-            if (cursorLastRun.getCount()>0){
-                cursorLastRun.moveToFirst();
-                double lastSpeed = cursorLastRun.getDouble(cursorLastRun.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT));
-                txtLastSpeed += " ("+getString(R.string.last_speed_mid)+" "+lastSpeed+getString(R.string.last_speed_end)+")";
-                mEtSpeedChoosed.setText(""+lastSpeed);
+        if (getActivity().getIntent().getAction()== RunningService.ACTION_SHOW_UI_FROM_RUN){
+            mEtSpeedChoosed.setText(""+getActivity().getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
+        }else{
+            Cursor cursorLastRun = getActivity().getContentResolver().query(RunContract.RunEntry.buildLastRunUri(), new String[]{RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT}, null, null, null);
+            if (cursorLastRun!=null){
+                if (cursorLastRun.getCount()>0){
+                    cursorLastRun.moveToFirst();
+                    double lastSpeed = cursorLastRun.getDouble(cursorLastRun.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT));
+                    txtLastSpeed += " ("+getString(R.string.last_speed_mid)+" "+lastSpeed+getString(R.string.last_speed_end)+")";
+                    mEtSpeedChoosed.setText(""+lastSpeed);
+                }
+                cursorLastRun.close();
             }
-            cursorLastRun.close();
         }
         mTvLastSpeed.setText(txtLastSpeed);
         if (currentUri!=null){

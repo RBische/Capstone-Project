@@ -87,4 +87,13 @@
     <string name="action_stop">Stop</string>
     <string name="sure_stop_run">Are you sure you want to stop this session ?</string>
     <string name="left">left</string>
+    <string name="meters_done_textview">
+        <xliff:g id="meters" example="15">%1$s</xliff:g> meters
+    </string>
+    <string name="meters_left_textview">
+        <xliff:g id="meters" example="15">%1$s</xliff:g> meters left
+    </string>
+    <string name="seconds_remaining_textview">
+        <xliff:g id="minutes" example="15">%1$s</xliff:g>:<xliff:g id="seconds" example="15">%2$s</xliff:g> seconds remaining
+    </string>
 </resources>

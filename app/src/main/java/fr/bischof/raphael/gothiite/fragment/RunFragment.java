@@ -144,7 +144,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             mRunIntervals.add(new RunTypeInterval(time, distance, effort));
         }
         if(mService!=null&&!mService.isLoaded()){
-            mService.loadRun(mRunTypeId,mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
+            mService.loadRun(mRunTypeId,mRunIntervals,mCurrentRunTypeName, mVVO2max, getActivity(), RunFragment.this);
         }
         data.moveToFirst();
         fillUI();
@@ -203,7 +203,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                 mService.forceRefresh();
             }else {
                 if (mRunIntervals!=null){
-                    mService.loadRun(mRunTypeId, mRunIntervals,mCurrentRunTypeName, getActivity(), RunFragment.this);
+                    mService.loadRun(mRunTypeId, mRunIntervals,mCurrentRunTypeName, mVVO2max, getActivity(), RunFragment.this);
                 }
             }
             mService.hideNotification();
@@ -254,14 +254,14 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                             nextRunType = getString(R.string.before_rest);
                         }
                     }
-                    //TODO: Ressources strings
-                    mTvMetersBeforeNext.setText("" + df.format(mService.getDistanceRemaining()>0?mService.getDistanceRemaining():0) + " meters");
+                    mTvMetersBeforeNext.setText(getString(R.string.meters_done_textview,df.format(mService.getDistanceRemaining()>0?mService.getDistanceRemaining():0)));
                     mTvBefore.setText(nextRunType);
-                    mTvEffortLeft.setText("" + df.format(mService.getDistanceRemainingInRun()) + " meters left");
-                    String v = String.format("%02d", millisUntilFinished/60000);
-                    mInvRunType.setTimeFromBeginning((int)(System.currentTimeMillis()-timeStartRun));
+                    mTvEffortLeft.setText(getString(R.string.meters_done_textview, df.format(mService.getDistanceRemainingInRun())));
+                    String minutes = String.format("%02d", millisUntilFinished/60000);
                     int va = (int)( (millisUntilFinished%60000)/1000);
-                    mTvTimer.setText(v + ":" + String.format("%02d", va) + " seconds remaining");
+                    String seconds = String.format("%02d", va);
+                    mInvRunType.setTimeFromBeginning((int)(System.currentTimeMillis()-timeStartRun));
+                    mTvTimer.setText(getString(R.string.seconds_remaining_textview,minutes,seconds));
                 }
             }
 

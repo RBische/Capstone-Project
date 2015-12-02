@@ -17,6 +17,7 @@ import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.data.RunDbHelper;
 import fr.bischof.raphael.gothiite.fragment.MainFragment;
+import fr.bischof.raphael.gothiite.service.RunningService;
 import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar()!=null){
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
+        if (getIntent().getAction()== RunningService.ACTION_SHOW_UI_FROM_RUN){
+            Intent runFromRunningServiceNotification = new Intent(this,SessionTypeActivity.class);
+            runFromRunningServiceNotification.setAction(RunningService.ACTION_SHOW_UI_FROM_RUN);
+            runFromRunningServiceNotification.putExtra(RunningService.EXTRA_VVO2MAX,getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
+            startActivity(runFromRunningServiceNotification);
+        }
     }
 
 
@@ -37,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        //TODO: edit IE
+        //TODO: edit IE + edit voice pack
         return true;
     }
 

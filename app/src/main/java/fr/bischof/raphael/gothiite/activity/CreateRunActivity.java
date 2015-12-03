@@ -6,23 +6,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Objects;
+
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.fragment.CreateRunFragment;
-import fr.bischof.raphael.gothiite.fragment.CreateSessionTypeFragment;
 import fr.bischof.raphael.gothiite.service.RunningService;
+import fr.bischof.raphael.gothiite.speech.MediaManager;
+import fr.bischof.raphael.gothiite.speech.Synthesizer;
 
 public class CreateRunActivity extends AppCompatActivity {
+
+    private MediaManager mSoundPoolManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_run);
-        if (getIntent().getAction()== RunningService.ACTION_SHOW_UI_FROM_RUN){
+        if (getIntent().getAction().equals(RunningService.ACTION_SHOW_UI_FROM_RUN)){
             Intent runFromRunningServiceNotification = new Intent(this,RunActivity.class);
             runFromRunningServiceNotification.setAction(RunningService.ACTION_SHOW_UI_FROM_RUN);
             runFromRunningServiceNotification.putExtra(RunningService.EXTRA_VVO2MAX,getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
             startActivity(runFromRunningServiceNotification);
         }
+        mSoundPoolManager = new MediaManager(this);
     }
 
     @Override
@@ -40,6 +46,12 @@ public class CreateRunActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_run){
             ((CreateRunFragment)getSupportFragmentManager().findFragmentById(R.id.fragment)).launchSession();
+        }else if (id == R.id.action_temp){
+            //,((CreateRunFragment) getSupportFragmentManager().findFragmentById(R.id.fragment)).getNumber(),((CreateRunFragment) getSupportFragmentManager().findFragmentById(R.id.fragment)).getNumber()
+            Synthesizer synthetizer = new Synthesizer(this,getString(R.string.mp3_pause));
+            String[] number = synthetizer.getSynthesizedParts();
+            mSoundPoolManager.addToQueue(number);
+            mSoundPoolManager.playSoundsInQueue();
         }
         return super.onOptionsItemSelected(item);
     }

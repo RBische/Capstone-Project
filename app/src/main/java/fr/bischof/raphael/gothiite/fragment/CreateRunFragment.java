@@ -72,7 +72,7 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         ButterKnife.inject(this, view);
         Uri currentUri  = getActivity().getIntent().getData();
         String txtLastSpeed = getString(R.string.last_speed_start);
-        if (getActivity().getIntent().getAction()== RunningService.ACTION_SHOW_UI_FROM_RUN){
+        if (getActivity().getIntent().getAction().equals(RunningService.ACTION_SHOW_UI_FROM_RUN)){
             mEtSpeedChoosed.setText(""+getActivity().getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
         }else{
             Cursor cursorLastRun = getActivity().getContentResolver().query(RunContract.RunEntry.buildLastRunUri(), new String[]{RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT}, null, null, null);
@@ -165,5 +165,9 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         intent.setData(getActivity().getIntent().getData());
         intent.putExtra(EXTRA_VVO2MAX, Double.parseDouble(mEtSpeedChoosed.getText().toString()));
         startActivity(intent);
+    }
+
+    public int getNumber() {
+        return Integer.parseInt(mEtSpeedChoosed.getText().toString());
     }
 }

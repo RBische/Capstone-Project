@@ -196,7 +196,6 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
                         .setContentText(String.format("%02d", (((long)currentInterval.getTimeToDo() - (System.currentTimeMillis() - mCurrentStartTime)) / 1000)) + "s " + getBaseContext().getString(R.string.left))
                                 .setContentTitle(getApplicationContext().getString(R.string.now_running))
                                 .setContentIntent(pi);
-                //TODO: Add icon notification in git
                 builder.setSmallIcon(R.drawable.icon_notification);
                 builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
                 notification = builder.build();

@@ -96,4 +96,5 @@
     <string name="seconds_remaining_textview">
         <xliff:g id="minutes" example="15">%1$s</xliff:g>:<xliff:g id="seconds" example="15">%2$s</xliff:g> seconds remaining
     </string>
+    <string name="action_temp">Say number</string>
 </resources>

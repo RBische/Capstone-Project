@@ -3,6 +3,10 @@ package fr.bischof.raphael.gothiite.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
+import fr.bischof.raphael.gothiite.calculator.Calculator;
+
 /**
  * Model class useful during a run
  * Created by biche on 29/11/2015.

@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -34,6 +36,7 @@ import java.util.UUID;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.MainActivity;
 import fr.bischof.raphael.gothiite.activity.RunActivity;
+import fr.bischof.raphael.gothiite.calculator.Calculator;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunInterval;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
@@ -231,14 +234,22 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             //Preparing Run to save
             UUID runId = UUID.randomUUID();
             String runTypeId = mRunTypeId;
-            //TODO: Calculate avg_speed & vvo2max equivalent
+            long timeRunned = 0;
+            long distanceRunned = 0;
+            for(RunInterval interval:mCurrentIntervalsDone){
+                timeRunned += interval.getEndTime()-interval.getStartTime();
+                distanceRunned+= interval.getDistanceDone();
+            }
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            double vVo2Max = Calculator.calculateVV02max(timeRunned,distanceRunned,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
+            double avg_speed = distanceRunned/(timeRunned/3600);
             Uri runsUri = RunContract.RunEntry.buildRunsUri();
             ArrayList<ContentValues> runsToSave = new ArrayList<>();
             ContentValues valuesToSaveForRun = new ContentValues();
-            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_AVG_SPEED, 0);
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_AVG_SPEED, avg_speed);
             valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_RUN_TYPE_ID, runTypeId);
             valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_START_DATE, mRunStartTime);
-            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT, 0);
+            valuesToSaveForRun.put(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT, vVo2Max);
             valuesToSaveForRun.put(RunContract.RunEntry._ID, runId.toString());
             runsToSave.add(valuesToSaveForRun);
             getBaseContext().getContentResolver().bulkInsert(runsUri, runsToSave.toArray(new ContentValues[runsToSave.size()]));

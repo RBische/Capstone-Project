@@ -134,7 +134,6 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
             double time = data.getDouble(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
             double distance = data.getDouble(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO));
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            //TODO: weight the distances/durations with the difficulty of the session
             if (distance==0&&effort){
                 distance = Calculator.calculateDistanceNeeded(time,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
             }
@@ -156,12 +155,6 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
         for(RunTypeInterval interval:mRunIntervals) {
             boolean effort = interval.isEffort();
             double time = interval.getTimeToDo();
-            double distance = interval.getDistanceToDo();
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            //TODO: weight the distances/durations with the difficulty of the session
-            if (time==0){
-                time = Calculator.calculateTimeNeeded(distance,mVVO2max,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
-            }
             int timeInSec = (int)time;
             ColorPart part = new ColorPart(timeInSec,!effort);
             partsToDraw.add(part);

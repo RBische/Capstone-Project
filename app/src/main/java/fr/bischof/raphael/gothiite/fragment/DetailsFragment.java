@@ -36,7 +36,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON,
             RunContract.RunIntervalEntry.TABLE_NAME+"."+RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE
     };
-
+    //TODO: It seems to be a bug, informations are not shown even if data seems to be good
     @InjectView(R.id.tvStartDate) TextView mTvStartDate;
     @InjectView(R.id.ivProgressionIcon) ImageView mIvProgressionIcon;
     @InjectView(R.id.tvDistanceDone) TextView mTvDistanceDone;

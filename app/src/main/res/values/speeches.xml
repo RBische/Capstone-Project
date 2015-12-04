@@ -115,6 +115,7 @@
         <item>thousand</item>
     </array>
     <string name="mp3_meters_left">numberToReplace|meters_to_go.mp3</string>
+    <string name="mp3_kilometers_left">numberToReplace|kilometers.mp3</string>
     <string name="mp3_seconds_left">numberToReplace|seconds_remaining.mp3</string>
     <string name="mp3_minutes_seconds_left">numberToReplace|minutes.mp3|numberToReplace|seconds_remaining.mp3</string>
     <string name="mp3_pause">pausing_workout.mp3</string>

@@ -225,7 +225,9 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onRunFinished() {
-        getActivity().finish();
+        if(getActivity()!=null){
+            getActivity().finish();
+        }
     }
 
     @Override

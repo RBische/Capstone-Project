@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -35,17 +36,23 @@ import java.util.UUID;
 
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.MainActivity;
-import fr.bischof.raphael.gothiite.activity.RunActivity;
 import fr.bischof.raphael.gothiite.calculator.Calculator;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.model.RunInterval;
 import fr.bischof.raphael.gothiite.model.RunTypeInterval;
+import fr.bischof.raphael.gothiite.speech.MediaManager;
+import fr.bischof.raphael.gothiite.speech.Synthesizer;
 
 /**
  * Service running during a session. This service maintains GPS coordinates retrieving, plays sound when its needed, etc...
  * Created by biche on 29/11/2015.
  */
 public class RunningService extends Service implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+    private static final long LENGTH_SHORT_VIBRATION = 400;
+    private static final long LENGTH_LONG_VIBRATION = 800;
+    private static final long LENGTH_PAUSE_VIBRATION = 200;
+    private MediaManager mMediaManager;
     public static final String ACTION_STAY_AWAKE = "ActionToForceServiceToStayAwake";
     public static final String ACTION_SHOW_UI_FROM_RUN = "ShowUIFromRun";
     public static final String EXTRA_VVO2MAX = "ExtraVvo2max";
@@ -72,6 +79,16 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private Location mEndPosition;
     private String mRunTypeId;
     private double mVVO2max;
+    private boolean mHalfIntervalSoundPlayed = false;
+    private boolean m10SecondsBeforeEndIntervalPlayed = false;
+    private boolean m5SecondsBeforeEndIntervalPlayed = false;
+    private CountDownTimer mCountDownTimer;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mMediaManager = new MediaManager(getBaseContext());
+    }
 
     @Nullable
     @Override
@@ -113,6 +130,7 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     private void startRun() {
         mCurrentStartTime = System.currentTimeMillis();
         mRunStartTime = mCurrentStartTime;
+        notifyStartOfTheRun();
         startTimer();
         mGoogleApiClient = new GoogleApiClient.Builder(getBaseContext())
                 .addConnectionCallbacks(this)
@@ -123,30 +141,58 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
     }
 
     private void startTimer() {
-        //TODO: generate sounds and vibrations
+        /*Pattern vibration (if effort) :
+            start : bzzzz
+            10s before end : bzz bzz
+            5/4/3/2/1s before end : bzz
+            end : bzzzz
+          Pattern sound :
+            &noneffort start : Time left & distance left
+            &noneffort half run : Time left & distance left
+            &noneffort 10s before end : time left + distance left
+            &noneffort 5s before end : distance left
+         */
         if (mRunIntervalsToDo!=null&&mRunIntervalsToDo.size()>0){
             if (mBoundListener !=null){
                 RunTypeInterval interval = null;
                 if (mRunIntervalsToDo.size()>1){
                     interval = mRunIntervalsToDo.get(1);
                 }
-                mBoundListener.onTimerStarted((long)mRunIntervalsToDo.get(0).getTimeToDo(),mRunStartTime,mRunIntervalsToDo.get(0).isEffort(),interval);
+                mBoundListener.onTimerStarted((long) mRunIntervalsToDo.get(0).getTimeToDo(), mRunStartTime, mRunIntervalsToDo.get(0).isEffort(), interval);
             }
             if(mNotificationShown){
                 showNotification();
             }
-            CountDownTimer cT =  new CountDownTimer((long) mRunIntervalsToDo.get(0).getTimeToDo() - 200, 1000) {
+            final long timeToDoInThisInterval = (long) mRunIntervalsToDo.get(0).getTimeToDo();
+            final long distanceToDoInThisInterval = (long) mRunIntervalsToDo.get(0).getDistanceToDo();
+            final boolean effort = mRunIntervalsToDo.get(0).isEffort();
+            notifyStartInterval(effort, mRunIntervalsToDo.get(0).getTimeToDo(), mRunIntervalsToDo.get(0).getDistanceToDo());
+            mCountDownTimer =  new CountDownTimer(timeToDoInThisInterval - 200, 1000) {
                 public void onTick(long millisUntilFinished) {
+                    if(!mHalfIntervalSoundPlayed &&timeToDoInThisInterval/2>(millisUntilFinished+200)&&timeToDoInThisInterval/2>15000){
+                        mHalfIntervalSoundPlayed = true;
+                        notifyHalfInterval(effort, millisUntilFinished, distanceToDoInThisInterval - mCurrentDistanceInInterval);
+                    }else if (!m10SecondsBeforeEndIntervalPlayed &&(millisUntilFinished+200)<10000){
+                        m10SecondsBeforeEndIntervalPlayed = true;
+                        notify10SecondsBeforeEndInterval(effort, millisUntilFinished, distanceToDoInThisInterval - mCurrentDistanceInInterval);
+                    }else if (!m5SecondsBeforeEndIntervalPlayed &&(millisUntilFinished+200)<5000){
+                        m5SecondsBeforeEndIntervalPlayed = true;
+                        notify5SecondsBeforeEndInterval(effort, distanceToDoInThisInterval - mCurrentDistanceInInterval);
+                    }
+                    if ((millisUntilFinished+200)<=5000){
+                        notifyEach5LastsSecondsBeforeEndInterval();
+                    }
                     if (mNotificationShown){
                         showNotification();
                     }
                 }
 
                 public void onFinish() {
+                    notifyEnd();
                     timerEnded();
                 }
             };
-            cT.start();
+            mCountDownTimer.start();
         }else{
             endRun(true);
         }
@@ -169,6 +215,9 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         }
         mRunIntervalsToDo.remove(0);
         mCurrentDistanceInInterval = 0;
+        mHalfIntervalSoundPlayed = false;
+        m10SecondsBeforeEndIntervalPlayed = false;
+        m5SecondsBeforeEndIntervalPlayed = false;
         mStartPosition = null;
         mEndPosition = null;
         mCurrentStartTime = System.currentTimeMillis();
@@ -242,7 +291,11 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             }
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             double vVo2Max = Calculator.calculateVV02max(timeRunned,distanceRunned,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
-            double avg_speed = distanceRunned/(timeRunned/3600);
+            //TODO: Correct this, in case of a leger test -> vVO2Max is calculated by the last interval
+            double avg_speed = 0;
+            if (timeRunned>0){
+                avg_speed = distanceRunned/(timeRunned/3600);
+            }
             Uri runsUri = RunContract.RunEntry.buildRunsUri();
             ArrayList<ContentValues> runsToSave = new ArrayList<>();
             ContentValues valuesToSaveForRun = new ContentValues();
@@ -281,6 +334,9 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         }
         if(mNotificationShown){
             hideNotification();
+        }
+        if(mCountDownTimer!=null){
+            mCountDownTimer.cancel();
         }
         stopLocationUpdates();
         stopSelf();
@@ -391,5 +447,132 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             mRequestingLocationUpdates = true;
         }
+    }
+
+    private void notifyStartOfTheRun() {
+        /*
+        start : bzzzz*/
+        vibrate(LENGTH_LONG_VIBRATION);
+    }
+
+    private void notifyStartInterval(boolean effort, double timeToDo, double distanceToDo) {
+        /*
+        &effort start : Time left & distance left*/
+        if (effort){
+            Synthesizer synthetizer;
+            if (timeToDo/60000>=1){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+            }
+            String[] soundsTime = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsTime);
+            if(distanceToDo>1000){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+            }
+            String[] soundsDistance = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsDistance);
+            mMediaManager.playSoundsInQueue();
+        }
+    }
+
+    private void notifyHalfInterval(boolean effort, double timeToDo, double distanceToDo) {
+        //half run : Time left & distance left
+        if (effort){
+            Synthesizer synthetizer;
+            if (timeToDo/60000>=1){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+            }
+            String[] soundsTime = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsTime);
+            if(distanceToDo>1000){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+            }
+            String[] soundsDistance = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsDistance);
+            mMediaManager.playSoundsInQueue();
+        }
+    }
+
+    private void notify10SecondsBeforeEndInterval(boolean effort, double timeToDo, double distanceToDo) {
+        /*
+        &effort 10s before end : time left + distance left
+        10s before end : bzz bzz*/
+        vibrate(LENGTH_SHORT_VIBRATION,LENGTH_PAUSE_VIBRATION,LENGTH_SHORT_VIBRATION);
+        if (effort){
+            Synthesizer synthetizer;
+            if (timeToDo/60000>=1){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+            }
+            String[] soundsTime = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsTime);
+            if(distanceToDo>1000){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+            }
+            String[] soundsDistance = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsDistance);
+            mMediaManager.playSoundsInQueue();
+        }
+    }
+
+    private void notify5SecondsBeforeEndInterval(boolean effort, double distanceToDo) {
+        //&effort 5s before end : distance left
+        if (effort){
+            Synthesizer synthetizer;
+            if(distanceToDo>1000){
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+            }else{
+                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+            }
+            String[] soundsDistance = synthetizer.getSynthesizedParts();
+            mMediaManager.addToQueue(soundsDistance);
+            mMediaManager.playSoundsInQueue();
+        }
+    }
+
+    private void notifyEach5LastsSecondsBeforeEndInterval() {
+        //5/4/3/2/1s before end : bzz
+        vibrate(LENGTH_SHORT_VIBRATION);
+    }
+
+    private void notifyEnd() {
+        //end : bzzzz
+        vibrate(LENGTH_LONG_VIBRATION);
+    }
+
+    private void vibrate(long... durations){
+        long[] vibrationsPattern = new long[]{0};
+        vibrationsPattern = generalConcatAll(vibrationsPattern,durations);
+        // Get instance of Vibrator from current Context
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // The '-1' here means to vibrate once, as '-1' is out of bounds in the pattern array
+        v.vibrate(vibrationsPattern, -1);
+    }
+
+    private long[] generalConcatAll(long[]... jobs) {
+        int len = 0;
+        for (final long[] job : jobs) {
+            len += job.length;
+        }
+
+        final long[] result = new long[len];
+
+        int currentPos = 0;
+        for (final long[] job : jobs) {
+            System.arraycopy(job, 0, result, currentPos, job.length);
+            currentPos += job.length;
+        }
+
+        return result;
     }
 }

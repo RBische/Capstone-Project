@@ -1,6 +1,7 @@
 package fr.bischof.raphael.gothiite.speech;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -22,18 +23,17 @@ public class MediaManager {
     AudioManager audioManager;
     ArrayList<String> queue = new ArrayList<>();
     int counter;
-    private Activity mActivity;
+    private Context mContext;
+    private boolean mPlaying = false;
 
-    /** Called when the activity is first created. */
-    public MediaManager(Activity activity) {
-        this.mActivity = activity;
+    /** Called when the mContext is first created. */
+    public MediaManager(Context mContext) {
+        this.mContext = mContext;
         // AudioManager audio settings for adjusting the volume
-        audioManager = (AudioManager) activity.getSystemService(Activity.AUDIO_SERVICE);
+        audioManager = (AudioManager) mContext.getSystemService(Activity.AUDIO_SERVICE);
         actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION);
         volume = actVolume / maxVolume;
-        //Hardware buttons setting to adjust the media sound
-        activity.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
 
         // the counter will help us recognize the stream id of the sound played  now
         counter = 0;
@@ -43,10 +43,9 @@ public class MediaManager {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 queue.remove(0);
-                playSoundsInQueue();
+                playSoundsRecursively();
             }
         });
-        playSoundsInQueue();
     }
 
     public void addToQueue(String[] sounds){
@@ -55,17 +54,26 @@ public class MediaManager {
     }
 
     public void playSoundsInQueue() {
+        if(!mPlaying){
+            playSoundsRecursively();
+        }
+    }
+
+    private void playSoundsRecursively(){
         if (queue.size()>0){
+            mPlaying = true;
             // Load the sounds
             try {
                 player.reset();
-                AssetFileDescriptor afd = mActivity.getAssets().openFd(queue.get(0));
+                AssetFileDescriptor afd = mContext.getAssets().openFd(queue.get(0));
                 player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 player.prepare();
                 player.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else{
+            mPlaying = false;
         }
     }
 

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar()!=null){
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
-        if (getIntent().getAction()== RunningService.ACTION_SHOW_UI_FROM_RUN){
+        if (getIntent().getAction()!=null&&getIntent().getAction().equals(RunningService.ACTION_SHOW_UI_FROM_RUN)){
             Intent runFromRunningServiceNotification = new Intent(this,SessionTypeActivity.class);
             runFromRunningServiceNotification.setAction(RunningService.ACTION_SHOW_UI_FROM_RUN);
             runFromRunningServiceNotification.putExtra(RunningService.EXTRA_VVO2MAX,getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));

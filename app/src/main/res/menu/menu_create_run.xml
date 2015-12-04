@@ -4,6 +4,4 @@
     tools:context="fr.bischof.raphael.gothiite.activity.CreateRunActivity">
     <item android:id="@+id/action_run" android:title="@string/action_run"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_temp" android:title="@string/action_temp"
-        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

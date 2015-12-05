@@ -9,6 +9,15 @@
         <item>ico_run</item>
         <item>ico_mountain</item>
     </array>
+    <array translatable="false"
+        name="pref_language_pack_values">
+        <item>en</item>
+        <item>fr</item>
+    </array>
+    <array name="pref_language_pack_options">
+        <item>English</item>
+        <item>French</item>
+    </array>
     <string name="action_signup_signin">Sign up/Sign in</string>
     <string name="title_activity_connection">Connection</string>
     <string name="login_hint">Login</string>
@@ -79,7 +88,7 @@
     <string name="last_speed_end">km/h</string>
     <string name="action_run">Run</string>
     <string name="title_activity_run">Run</string>
-    <string name="pref_ie">pref_ie</string>
+    <string name="pref_ie" translatable="false">pref_ie</string>
     <string name="now_running">Current running session</string>
     <string name="before_stop">before stop</string>
     <string name="before_effort">before effort</string>
@@ -97,4 +106,10 @@
         <xliff:g id="minutes" example="15">%1$s</xliff:g>:<xliff:g id="seconds" example="15">%2$s</xliff:g> seconds remaining
     </string>
     <string name="action_temp">Say number</string>
+    <string name="pref_ie_label">Endurance index</string>
+    <string name="pref_ie_default">-6.5</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_language_pack_label">Language pack</string>
+    <string name="pref_language_pack_key">pref_language_pack</string>
+    <string name="pref_language_pack_default">en</string>
 </resources>

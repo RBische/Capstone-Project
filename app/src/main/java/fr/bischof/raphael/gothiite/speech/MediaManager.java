@@ -2,14 +2,18 @@ package fr.bischof.raphael.gothiite.speech;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import fr.bischof.raphael.gothiite.R;
 
 
 /**
@@ -65,12 +69,14 @@ public class MediaManager {
             // Load the sounds
             try {
                 player.reset();
-                AssetFileDescriptor afd = mContext.getAssets().openFd(queue.get(0));
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+                AssetFileDescriptor afd = mContext.getAssets().openFd(preferences.getString(mContext.getString(R.string.pref_language_pack_key),mContext.getString(R.string.pref_language_pack_default))+"/"+queue.get(0));
                 player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 player.prepare();
                 player.start();
             } catch (IOException e) {
-                e.printStackTrace();
+                queue.clear();
+                mPlaying = false;
             }
         }else{
             mPlaying = false;

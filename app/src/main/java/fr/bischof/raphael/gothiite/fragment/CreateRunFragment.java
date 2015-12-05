@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +73,7 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         ButterKnife.inject(this, view);
         Uri currentUri  = getActivity().getIntent().getData();
         String txtLastSpeed = getString(R.string.last_speed_start);
+        DecimalFormat df = new DecimalFormat("#.##");
         if (getActivity().getIntent().getAction()!=null&&getActivity().getIntent().getAction().equals(RunningService.ACTION_SHOW_UI_FROM_RUN)){
             mEtSpeedChoosed.setText(""+getActivity().getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
         }else{
@@ -80,8 +82,8 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
                 if (cursorLastRun.getCount()>0){
                     cursorLastRun.moveToFirst();
                     double lastSpeed = cursorLastRun.getDouble(cursorLastRun.getColumnIndex(RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT));
-                    txtLastSpeed += " ("+getString(R.string.last_speed_mid)+" "+lastSpeed+getString(R.string.last_speed_end)+")";
-                    mEtSpeedChoosed.setText(""+lastSpeed);
+                    txtLastSpeed += " ("+getString(R.string.last_speed_mid)+" "+df.format(lastSpeed)+getString(R.string.last_speed_end)+")";
+                    mEtSpeedChoosed.setText(""+df.format(lastSpeed));
                 }
                 cursorLastRun.close();
             }

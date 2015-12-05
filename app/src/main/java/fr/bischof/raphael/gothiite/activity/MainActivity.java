@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        //TODO: edit IE + edit voice pack
         return true;
     }
 
@@ -87,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                     .setNegativeButton(getString(R.string.no), dialogClickListener).show();
         }else if (id == R.id.action_sync){
             GothiiteSyncAdapter.syncImmediately(this);
+        }else if (id == R.id.action_settings){
+            startActivity(new Intent(this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

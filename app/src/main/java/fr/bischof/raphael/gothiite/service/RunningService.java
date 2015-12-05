@@ -285,13 +285,21 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
             String runTypeId = mRunTypeId;
             long timeRunned = 0;
             long distanceRunned = 0;
+            double speedLegerTest = 0;
             for(RunInterval interval:mCurrentIntervalsDone){
                 timeRunned += interval.getEndTime()-interval.getStartTime();
                 distanceRunned+= interval.getDistanceDone();
+                if (runTypeId.equalsIgnoreCase("739c19d4-f987-4c87-a160-6de74017a3d1")){
+                    speedLegerTest = interval.getDistanceDone()/((interval.getEndTime()-interval.getStartTime())/3600);
+                }
             }
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            double vVo2Max = Calculator.calculateVV02max(timeRunned,distanceRunned,preferences.getFloat(getString(R.string.pref_ie),-6.5f));
-            //TODO: Correct this, in case of a leger test -> vVO2Max is calculated by the last interval
+            float ie = Float.parseFloat(preferences.getString(getString(R.string.pref_ie), "-6.5"));
+            double vVo2Max = Calculator.calculateVV02max(timeRunned,distanceRunned,ie);
+            //In case of a leger test, the last speed represents the vVO2Max
+            if (runTypeId.equalsIgnoreCase("739c19d4-f987-4c87-a160-6de74017a3d1")){
+                vVo2Max = speedLegerTest;
+            }
             double avg_speed = 0;
             if (timeRunned>0){
                 avg_speed = distanceRunned/(timeRunned/3600);
@@ -461,16 +469,16 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (effort){
             Synthesizer synthetizer;
             if (timeToDo/60000>=1){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_minutes_seconds_left,(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_seconds_left,(int)(timeToDo/1000));
             }
             String[] soundsTime = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsTime);
             if(distanceToDo>1000){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_kilometers_left,(int)(distanceToDo/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+                synthetizer = new Synthesizer(this,R.string.mp3_meters_left,(int)distanceToDo);
             }
             String[] soundsDistance = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsDistance);
@@ -483,16 +491,16 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (effort){
             Synthesizer synthetizer;
             if (timeToDo/60000>=1){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_minutes_seconds_left,(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_seconds_left,(int)(timeToDo/1000));
             }
             String[] soundsTime = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsTime);
             if(distanceToDo>1000){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_kilometers_left,(int)(distanceToDo/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+                synthetizer = new Synthesizer(this,R.string.mp3_meters_left,(int)distanceToDo);
             }
             String[] soundsDistance = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsDistance);
@@ -508,16 +516,16 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (effort){
             Synthesizer synthetizer;
             if (timeToDo/60000>=1){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_minutes_seconds_left),(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_minutes_seconds_left,(int)(timeToDo/60000),(int)((timeToDo%60000)/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_seconds_left),(int)(timeToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_seconds_left,(int)(timeToDo/1000));
             }
             String[] soundsTime = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsTime);
             if(distanceToDo>1000){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_kilometers_left,(int)(distanceToDo/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+                synthetizer = new Synthesizer(this,R.string.mp3_meters_left,(int)distanceToDo);
             }
             String[] soundsDistance = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsDistance);
@@ -530,9 +538,9 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         if (effort){
             Synthesizer synthetizer;
             if(distanceToDo>1000){
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_kilometers_left),(int)(distanceToDo/1000));
+                synthetizer = new Synthesizer(this,R.string.mp3_kilometers_left,(int)(distanceToDo/1000));
             }else{
-                synthetizer = new Synthesizer(this,getString(R.string.mp3_meters_left),(int)distanceToDo);
+                synthetizer = new Synthesizer(this,R.string.mp3_meters_left,(int)distanceToDo);
             }
             String[] soundsDistance = synthetizer.getSynthesizedParts();
             mMediaManager.addToQueue(soundsDistance);

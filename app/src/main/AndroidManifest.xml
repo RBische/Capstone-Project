@@ -124,6 +124,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.bischof.raphael.gothiite.activity.CreateRunActivity" />
         </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/SettingsTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.bischof.raphael.gothiite.activity.MainActivity" />
+        </activity>
 
         <service
             android:name=".service.RunningService"

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+     <EditTextPreference
+         android:inputType="numberDecimal"
+         android:title="@string/pref_ie_label"
+         android:key="@string/pref_ie"
+         android:defaultValue="@string/pref_ie_default"
+         android:singleLine="true"/>
+
+    <ListPreference
+        android:title="@string/pref_language_pack_label"
+        android:key="@string/pref_language_pack_key"
+        android:defaultValue="@string/pref_language_pack_default"
+        android:entryValues="@array/pref_language_pack_values"
+        android:entries="@array/pref_language_pack_options" />
+</PreferenceScreen>

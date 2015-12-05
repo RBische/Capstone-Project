@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
@@ -36,7 +38,6 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON,
             RunContract.RunIntervalEntry.TABLE_NAME+"."+RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE
     };
-    //TODO: It seems to be a bug, informations are not shown even if data seems to be good
     @InjectView(R.id.tvStartDate) TextView mTvStartDate;
     @InjectView(R.id.ivProgressionIcon) ImageView mIvProgressionIcon;
     @InjectView(R.id.tvDistanceDone) TextView mTvDistanceDone;
@@ -94,11 +95,13 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data.getCount()>0){
             data.moveToFirst();
+            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat dfShort = new DecimalFormat("#.#");
             long date = data.getLong(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_START_DATE));
             String dateText = DateToShowFormat.getFriendlyDayString(getActivity(), date);
             mTvStartDate.setText(dateText);
-            mTvAverageSpeed.setText(""+data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_AVG_SPEED))+" "+getString(R.string.kmh));
-            mTvVVO2maxEquivalent.setText(""+data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT))+" "+getString(R.string.kmh));
+            mTvAverageSpeed.setText(""+dfShort.format(data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_AVG_SPEED)))+" "+getString(R.string.kmh));
+            mTvVVO2maxEquivalent.setText(""+dfShort.format(data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT)))+" "+getString(R.string.kmh));
             double totalMetersDone = 0;
             String iconResource = data.getString(data.getColumnIndex(RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON));
             mIvProgressionIcon.setImageResource(getActivity().getResources().getIdentifier(iconResource, "drawable", getActivity().getPackageName()));
@@ -107,14 +110,14 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 data.moveToNext();
             }
             if (totalMetersDone>1000){
-                mTvDistanceDone.setText(""+totalMetersDone+" "+getString(R.string.kilometers_abreviation));
+                mTvDistanceDone.setText(""+df.format(totalMetersDone / 1000)+" "+getString(R.string.kilometers_abreviation));
             }else{
-                mTvDistanceDone.setText(""+totalMetersDone+" "+getString(R.string.meters_abreviation));
+                mTvDistanceDone.setText(""+df.format(totalMetersDone)+" "+getString(R.string.meters_abreviation));
             }
             if (totalMetersDone/data.getCount()>1000){
-                mTvDistancePerInterval.setText(""+(totalMetersDone/data.getCount())+" "+getString(R.string.kilometers_per_interval_abreviation));
+                mTvDistancePerInterval.setText(""+df.format(totalMetersDone / (data.getCount() * 1000))+" "+getString(R.string.kilometers_per_interval_abreviation));
             }else{
-                mTvDistancePerInterval.setText(""+(totalMetersDone/data.getCount())+" "+getString(R.string.meters_per_interval_abreviation));
+                mTvDistancePerInterval.setText(""+df.format(totalMetersDone / data.getCount())+" "+getString(R.string.meters_per_interval_abreviation));
             }
         }
     }

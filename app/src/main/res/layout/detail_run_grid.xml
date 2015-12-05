@@ -18,20 +18,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:layout_height="wrap_content"
     app:columnCount="2">
-
-    <android.support.v7.widget.Space
-        android:layout_height="0dp"
-        app:layout_columnSpan="2"
-        app:layout_columnWeight="1"
-        app:layout_rowWeight="1" />
 
     <TextView
         android:id="@+id/tvStartDate"
-        android:layout_marginBottom="@dimen/abc_list_item_padding_horizontal_material"
-        android:layout_marginTop="@dimen/abc_list_item_padding_horizontal_material"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:fontFamily="sans-serif"
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -75,19 +68,13 @@
     <TextView
         android:id="@+id/tvDistancePerInterval"
         android:layout_width="0dp"
-        android:layout_marginBottom="@dimen/abc_list_item_padding_horizontal_material"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
         android:fontFamily="sans-serif-light"
         android:gravity="center_horizontal"
         android:textColor="@color/secondary_text"
         android:textSize="20sp"
         app:layout_columnWeight="1"
         tools:text="100m/interval" />
-
-    <android.support.v7.widget.Space
-        android:layout_height="0dp"
-        app:layout_columnSpan="2"
-        app:layout_columnWeight="1"
-        app:layout_rowWeight="1" />
 
 </android.support.v7.widget.GridLayout>
 

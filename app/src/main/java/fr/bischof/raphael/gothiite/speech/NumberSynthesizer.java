@@ -1,9 +1,14 @@
 package fr.bischof.raphael.gothiite.speech;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.preference.PreferenceManager;
+import android.support.annotation.ArrayRes;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Locale;
 
 import fr.bischof.raphael.gothiite.R;
 
@@ -16,11 +21,6 @@ public class NumberSynthesizer {
 
     public NumberSynthesizer(Context context) {
         this.mContext = context;
-    }
-
-    public String[] getSynthesizeNumber(int number){
-        ArrayList<String> arrayListParts = getSynthesizeNumberAsArrayList(number);
-        return arrayListParts.toArray(new String[arrayListParts.size()]);
     }
 
     public ArrayList<String> getSynthesizeNumberAsArrayList(int number){
@@ -36,7 +36,7 @@ public class NumberSynthesizer {
 
     private String[] synthesizeNumber(int number){
         if(number<1000000){
-            String[] numberResources = mContext.getResources().getStringArray(R.array.mp3_numbers);
+            String[] numberResources = getArrayFromGoodResources(mContext,R.array.mp3_numbers);
             if(number<100){
                 return numberResources[number].split("\\|");
             }else if (number<1000){
@@ -97,5 +97,23 @@ public class NumberSynthesizer {
         }
 
         return result;
+    }
+
+    private String[] getArrayFromGoodResources(Context context,@ArrayRes int arrayToRetrieve) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String language = preferences.getString(context.getString(R.string.pref_language_pack_key), context.getString(R.string.pref_language_pack_default));
+        Resources res = context.getResources();
+        Configuration conf = res.getConfiguration();
+        Locale savedLocale = conf.locale;
+        conf.locale = new Locale(language); // whatever you want here
+        res.updateConfiguration(conf, null); // second arg null means don't change
+
+        // retrieve resources from desired locale
+        String[] str = res.getStringArray(arrayToRetrieve);
+
+        // restore original locale
+        conf.locale = savedLocale;
+        res.updateConfiguration(conf, null);
+        return str;
     }
 }

@@ -22,7 +22,7 @@
         <item>eighteen</item>
         <item>nineteen</item>
         <item>twenty</item>
-        <item>twenty|and|one</item>
+        <item>twenty|one</item>
         <item>twenty|two</item>
         <item>twenty|three</item>
         <item>twenty|four</item>
@@ -32,7 +32,7 @@
         <item>twenty|eight</item>
         <item>twenty|nine</item>
         <item>thirty</item>
-        <item>thirty|and|one</item>
+        <item>thirty|one</item>
         <item>thirty|two</item>
         <item>thirty|three</item>
         <item>thirty|four</item>
@@ -42,7 +42,7 @@
         <item>thirty|eight</item>
         <item>thirty|nine</item>
         <item>forty</item>
-        <item>forty|and|one</item>
+        <item>forty|one</item>
         <item>forty|two</item>
         <item>forty|three</item>
         <item>forty|four</item>
@@ -52,7 +52,7 @@
         <item>forty|eight</item>
         <item>forty|nine</item>
         <item>fifty</item>
-        <item>fifty|and|one</item>
+        <item>fifty|one</item>
         <item>fifty|two</item>
         <item>fifty|three</item>
         <item>fifty|four</item>
@@ -62,7 +62,7 @@
         <item>fifty|eight</item>
         <item>fifty|nine</item>
         <item>sixty</item>
-        <item>sixty|and|one</item>
+        <item>sixty|one</item>
         <item>sixty|two</item>
         <item>sixty|three</item>
         <item>sixty|four</item>
@@ -71,16 +71,16 @@
         <item>sixty|seven</item>
         <item>sixty|eight</item>
         <item>sixty|nine</item>
-        <item>sixty|dix</item>
-        <item>sixty|eleven</item>
-        <item>sixty|twelve</item>
-        <item>sixty|thirteen</item>
-        <item>sixty|fourteen</item>
-        <item>sixty|fifteen</item>
-        <item>sixty|sixteen</item>
-        <item>sixty|seventeen</item>
-        <item>sixty|eighteen</item>
-        <item>sixty|nineteen</item>
+        <item>seventy</item>
+        <item>seventy|one</item>
+        <item>seventy|two</item>
+        <item>seventy|three</item>
+        <item>seventy|four</item>
+        <item>seventy|five</item>
+        <item>seventy|six</item>
+        <item>seventy|seven</item>
+        <item>seventy|eight</item>
+        <item>seventy|nine</item>
         <item>eighty</item>
         <item>eighty|one</item>
         <item>eighty|two</item>
@@ -91,18 +91,18 @@
         <item>eighty|seven</item>
         <item>eighty|eight</item>
         <item>eighty|nine</item>
-        <item>eighty|dix</item>
-        <item>eighty|eleven</item>
-        <item>eighty|twelve</item>
-        <item>eighty|thirteen</item>
-        <item>eighty|fourteen</item>
-        <item>eighty|fifteen</item>
-        <item>eighty|sixteen</item>
-        <item>eighty|seventeen</item>
-        <item>eighty|eighteen</item>
-        <item>eighty|nineteen</item>
-        <item/>
-        <item>hundred</item>
+        <item>ninety</item>
+        <item>ninety|one</item>
+        <item>ninety|two</item>
+        <item>ninety|three</item>
+        <item>ninety|four</item>
+        <item>ninety|five</item>
+        <item>ninety|six</item>
+        <item>ninety|sevene</item>
+        <item>ninety|eight</item>
+        <item>ninety|nine</item>
+        <item>and</item>
+        <item>one|hundred</item>
         <item>two|hundred</item>
         <item>three|hundred</item>
         <item>four|hundred</item>

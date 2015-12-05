@@ -1,8 +1,16 @@
 package fr.bischof.raphael.gothiite.speech;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.preference.PreferenceManager;
+import android.support.annotation.StringRes;
 
 import java.util.ArrayList;
+import java.util.Locale;
+
+import fr.bischof.raphael.gothiite.R;
 
 /**
  * Class that contains the logic to synthesize a text and return parts that have to be played
@@ -13,14 +21,9 @@ public class Synthesizer {
     private String mToSynthesize;
     private int[] mNumberToSynthesize = new int[]{0};
 
-    public Synthesizer(Context context, String toSynthesize) {
+    public Synthesizer(Context context,@StringRes int toSynthesize, int... numberToSynthesize) {
         this.mNumberSynthesizer = new NumberSynthesizer(context);
-        this.mToSynthesize = toSynthesize;
-    }
-
-    public Synthesizer(Context context, String toSynthesize, int... numberToSynthesize) {
-        this.mNumberSynthesizer = new NumberSynthesizer(context);
-        this.mToSynthesize = toSynthesize;
+        this.mToSynthesize = getStringFromGoodResources(context,toSynthesize);
         this.mNumberToSynthesize = numberToSynthesize;
     }
 
@@ -41,5 +44,23 @@ public class Synthesizer {
             }
         }
         return parts.toArray(new String[parts.size()]);
+    }
+
+    private String getStringFromGoodResources(Context context,@StringRes int toSynthesize) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String language = preferences.getString(context.getString(R.string.pref_language_pack_key), context.getString(R.string.pref_language_pack_default));
+        Resources res = context.getResources();
+        Configuration conf = res.getConfiguration();
+        Locale savedLocale = conf.locale;
+        conf.locale = new Locale(language); // whatever you want here
+        res.updateConfiguration(conf, null); // second arg null means don't change
+
+        // retrieve resources from desired locale
+        String str = res.getString(toSynthesize);
+
+        // restore original locale
+        conf.locale = savedLocale;
+        res.updateConfiguration(conf, null);
+        return str;
     }
 }

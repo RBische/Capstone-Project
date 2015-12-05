@@ -11,10 +11,16 @@
         android:layout_height="?attr/actionBarSize"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <include layout="@layout/detail_run_grid"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"/>
+        android:layout_weight="4"
+        android:background="@android:color/white">
+        <include layout="@layout/detail_run_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
 
     <include layout="@layout/detail_extras_grid"
         android:layout_width="match_parent"

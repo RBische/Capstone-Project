@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -163,13 +164,13 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
     }
 
     public void launchSession() {
-        Intent intent = new Intent(getActivity(), RunActivity.class);
-        intent.setData(getActivity().getIntent().getData());
-        intent.putExtra(EXTRA_VVO2MAX, Double.parseDouble(mEtSpeedChoosed.getText().toString()));
-        startActivity(intent);
-    }
-
-    public int getNumber() {
-        return Integer.parseInt(mEtSpeedChoosed.getText().toString());
+        if(Double.parseDouble(mEtSpeedChoosed.getText().toString())<35&&Double.parseDouble(mEtSpeedChoosed.getText().toString())>2){
+            Intent intent = new Intent(getActivity(), RunActivity.class);
+            intent.setData(getActivity().getIntent().getData());
+            intent.putExtra(EXTRA_VVO2MAX, Double.parseDouble(mEtSpeedChoosed.getText().toString()));
+            startActivity(intent);
+        }else{
+            Toast.makeText(getActivity(),getString(R.string.vvo2max_must_be_between_2_and_35),Toast.LENGTH_SHORT).show();
+        }
     }
 }

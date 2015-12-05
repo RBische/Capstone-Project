@@ -15,10 +15,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import fr.bischof.raphael.gothiite.R;
 
@@ -92,7 +94,28 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         setPreferenceSummary(preference, value);
+        if (preference.getKey().equals(getString(R.string.pref_ie))){
+            if(isDouble(value.toString())){
+                double number = Double.parseDouble(value.toString());
+                if (number<-24||number>0){
+                    Toast.makeText(this,getString(R.string.index_must_be_between_24_and_0),Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }else{
+                Toast.makeText(this,getString(R.string.must_be_a_number),Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
         return true;
+    }
+
+    private boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     // This gets called after the preference is changed, which is important because we

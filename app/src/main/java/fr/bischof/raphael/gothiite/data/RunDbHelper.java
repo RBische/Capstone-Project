@@ -16,7 +16,7 @@ import fr.bischof.raphael.gothiite.R;
 public class RunDbHelper  extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
     private Context mContext;
 
     static final String DATABASE_NAME = "run.db";
@@ -73,21 +73,17 @@ public class RunDbHelper  extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
                 RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
 
-        final String SQL_CREATE_DELETE_TABLE = "CREATE TABLE " + RunContract.RunTypeIntervalEntry.TABLE_NAME + " (" +
-                RunContract.RunTypeIntervalEntry._ID + " TEXT PRIMARY KEY," +
-                RunContract.RunTypeIntervalEntry.COLUMN_DISTANCE_TO_DO + " REAL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + " TEXT NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_EFFORT + " INTEGER NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_SPEED_ESTIMATED + " REAL, " +
-                RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO + " REAL, " +
-                " FOREIGN KEY (" + RunContract.RunTypeIntervalEntry.COLUMN_RUN_TYPE_ID + ") REFERENCES " +
-                RunContract.RunTypeEntry.TABLE_NAME + " (" + RunContract.RunTypeEntry._ID + "));";
+        final String SQL_CREATE_DELETE_TABLE = "CREATE TABLE " + RunContract.DeleteEntry.TABLE_NAME + " (" +
+                RunContract.DeleteEntry._ID + " TEXT PRIMARY KEY," +
+                RunContract.DeleteEntry.COLUMN_PK_COLUMN_NAME + " TEXT," +
+                RunContract.DeleteEntry.COLUMN_ID + " TEXT, " +
+                RunContract.DeleteEntry.COLUMN_NAME + " TEXT);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_INTERVAL_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_TYPE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_RUN_TYPE_INTERVAL_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_DELETE_TABLE);
         fillWithBaseData(sqLiteDatabase);
     }
 
@@ -153,6 +149,7 @@ public class RunDbHelper  extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RunContract.RunIntervalEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RunContract.RunTypeEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RunContract.RunTypeIntervalEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RunContract.DeleteEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

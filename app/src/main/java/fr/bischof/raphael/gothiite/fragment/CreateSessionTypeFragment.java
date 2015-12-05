@@ -313,6 +313,12 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             public void onClick(DialogInterface dialogInterface, int i) {
                 ContentResolver contentResolver = getContext().getContentResolver();
                 contentResolver.delete(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalUri(id), null, null);
+                ContentValues values = new ContentValues();
+                values.put(RunContract.DeleteEntry._ID,UUID.randomUUID().toString());
+                values.put(RunContract.DeleteEntry.COLUMN_ID,id);
+                values.put(RunContract.DeleteEntry.COLUMN_NAME,"RunTypeInterval");
+                values.put(RunContract.DeleteEntry.COLUMN_PK_COLUMN_NAME,"runTypeIntervalId");
+                contentResolver.insert(RunContract.DeleteEntry.CONTENT_URI,values);
             }
         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override
@@ -327,7 +333,19 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 ContentResolver contentResolver = getContext().getContentResolver();
-                contentResolver.delete(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID),null,null);
+                contentResolver.delete(RunContract.RunTypeEntry.buildRunTypeUri(mRunTypeID), null, null);
+                ContentValues values = new ContentValues();
+                values.put(RunContract.DeleteEntry._ID,UUID.randomUUID().toString());
+                values.put(RunContract.DeleteEntry.COLUMN_ID,mRunTypeID);
+                values.put(RunContract.DeleteEntry.COLUMN_NAME,"RunType");
+                values.put(RunContract.DeleteEntry.COLUMN_PK_COLUMN_NAME, "runTypeId");
+                contentResolver.insert(RunContract.DeleteEntry.CONTENT_URI, values);
+                ContentValues valuesInterval = new ContentValues();
+                valuesInterval.put(RunContract.DeleteEntry._ID, UUID.randomUUID().toString());
+                valuesInterval.put(RunContract.DeleteEntry.COLUMN_ID, mRunTypeID);
+                valuesInterval.put(RunContract.DeleteEntry.COLUMN_NAME, "RunTypeInterval");
+                valuesInterval.put(RunContract.DeleteEntry.COLUMN_PK_COLUMN_NAME, "runTypeId");
+                contentResolver.insert(RunContract.DeleteEntry.CONTENT_URI,valuesInterval);
                 getActivity().finish();
             }
         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {

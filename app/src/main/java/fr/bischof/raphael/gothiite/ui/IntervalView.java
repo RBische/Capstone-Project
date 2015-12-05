@@ -85,7 +85,10 @@ public class IntervalView extends View {
             }
             x+=rectangleWidth;
         }
-        int grayRectangleWidth = parentWidth*mTimeFromBeginning/summedSize;
+        int grayRectangleWidth = 0;
+        if (summedSize>0){
+            grayRectangleWidth = parentWidth*mTimeFromBeginning/summedSize;
+        }
         canvas.drawRect(new Rect(0, 0, grayRectangleWidth, parentHeight), paintGray);
     }
 

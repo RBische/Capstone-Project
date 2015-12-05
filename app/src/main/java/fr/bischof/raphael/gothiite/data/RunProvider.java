@@ -25,6 +25,7 @@ public class RunProvider extends ContentProvider {
     public static final int RUN_TYPE = 301;
     public static final int RUN_TYPE_INTERVALS = 400;
     public static final int RUN_TYPE_INTERVAL = 401;
+    public static final int DELETE = 500;
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -34,6 +35,7 @@ public class RunProvider extends ContentProvider {
     private static final SQLiteQueryBuilder sRunTypesQueryBuilder;
     private static final SQLiteQueryBuilder sRunTypeIntervalsQueryBuilder;
     private static final SQLiteQueryBuilder sRunsWithRunTypeQueryBuilder;
+    private static final SQLiteQueryBuilder sDeleteQueryBuilder;
 
 
     private static final String sRunIntervalWithRunSelection =
@@ -74,6 +76,9 @@ public class RunProvider extends ContentProvider {
         sRunTypeIntervalsQueryBuilder = new SQLiteQueryBuilder();
         sRunTypeIntervalsQueryBuilder.setTables(
                 RunContract.RunTypeIntervalEntry.TABLE_NAME );
+        sDeleteQueryBuilder = new SQLiteQueryBuilder();
+        sDeleteQueryBuilder.setTables(
+                RunContract.DeleteEntry.TABLE_NAME );
     }
 
     static UriMatcher buildUriMatcher() {
@@ -95,6 +100,7 @@ public class RunProvider extends ContentProvider {
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE + "/*", RUN_TYPE);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL, RUN_TYPE_INTERVALS);
         matcher.addURI(authority, RunContract.PATH_RUN_TYPE_INTERVAL + "/*", RUN_TYPE_INTERVAL);
+        matcher.addURI(authority, RunContract.PATH_DELETE, DELETE);
         return matcher;
     }
 
@@ -149,6 +155,11 @@ public class RunProvider extends ContentProvider {
             case RUN_TYPE_INTERVALS:
             {
                 retCursor = getRunTypeIntervals(projection, selection, selectionArgs, sortOrder);
+                break;
+            }
+            case DELETE:
+            {
+                retCursor = getDelete();
                 break;
             }
             default:
@@ -229,7 +240,7 @@ public class RunProvider extends ContentProvider {
     }
 
     private Cursor getRunsWithRunType(String[] projection, String sortOrder) {
-        return getRunsWithRunType(projection,sortOrder,null,null,0);
+        return getRunsWithRunType(projection, sortOrder, null, null, 0);
     }
 
     private Cursor getRuns(String[] projection, String sortOrder) {
@@ -240,6 +251,17 @@ public class RunProvider extends ContentProvider {
                 null,
                 null,
                 sortOrder
+        );
+    }
+
+    public Cursor getDelete() {
+        return sDeleteQueryBuilder.query(new RunDbHelper(getContext()).getReadableDatabase(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
     }
 
@@ -270,6 +292,8 @@ public class RunProvider extends ContentProvider {
                 return RunContract.RunTypeIntervalEntry.CONTENT_ITEM_TYPE;
             case RUN_TYPE_INTERVAL:
                 return RunContract.RunTypeIntervalEntry.CONTENT_ITEM_TYPE;
+            case DELETE:
+                return RunContract.DeleteEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -279,7 +303,7 @@ public class RunProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues contentValues) {
         final SQLiteDatabase db = new RunDbHelper(getContext()).getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        Uri returnUri;
+        Uri returnUri = null;
 
         switch (match) {
             case RUN: {
@@ -303,6 +327,10 @@ public class RunProvider extends ContentProvider {
             case RUN_TYPE_INTERVALS: {
                 db.insert(RunContract.RunTypeIntervalEntry.TABLE_NAME, null, contentValues);
                 returnUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
+                break;
+            }
+            case DELETE: {
+                db.insert(RunContract.DeleteEntry.TABLE_NAME, null, contentValues);
                 break;
             }
             default:
@@ -421,6 +449,13 @@ public class RunProvider extends ContentProvider {
                 if (rowsDeleted>0){
                     db.delete(RunContract.RunTypeIntervalEntry.TABLE_NAME, selectionRunTypeInterval, selectionArgs);
                 }
+                if (getContext()!=null){
+                    getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
+                }
+                break;
+            }
+            case DELETE: {
+                rowsDeleted = db.delete(RunContract.DeleteEntry.TABLE_NAME, null, null);
                 if (getContext()!=null){
                     getContext().getContentResolver().notifyChange(RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri(), null);
                 }

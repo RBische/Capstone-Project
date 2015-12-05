@@ -32,6 +32,7 @@ public class RunContract  {
     public static final String PATH_RUN_TYPE = "runtype";
     public static final String PATH_RUN_TYPE_INTERVAL = "runtypeInterval";
     public static final String PATH_RUN_INTERVAL_WITH_RUN = "runIntervalwithrun";
+    public static final String PATH_DELETE = "delete";
 
 
     /* Inner class that defines the table contents of the run table */
@@ -160,8 +161,6 @@ public class RunContract  {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_RUN_TYPE_INTERVAL).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN_TYPE_INTERVAL;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN_TYPE_INTERVAL;
 
@@ -186,5 +185,22 @@ public class RunContract  {
         public static String getRunTypeIntervalIdFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
+    }
+
+
+    /* Inner class that defines the table contents of the run table */
+    public static final class DeleteEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DELETE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_RUN;
+
+        // Table name
+        public static final String TABLE_NAME = "deleteTable";
+
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_PK_COLUMN_NAME = "pkColumnName";
+        public static final String COLUMN_ID = "idToDelete";
     }
 }

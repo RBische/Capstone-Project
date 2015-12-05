@@ -112,4 +112,7 @@
     <string name="pref_language_pack_label">Language pack</string>
     <string name="pref_language_pack_key">pref_language_pack</string>
     <string name="pref_language_pack_default">en</string>
+    <string name="must_be_a_number">Number waited</string>
+    <string name="index_must_be_between_24_and_0">Endurance index must be between -24 and 0</string>
+    <string name="vvo2max_must_be_between_2_and_35">VVo2max must be between 2km/h and 35 km/h</string>
 </resources>

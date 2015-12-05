@@ -43,14 +43,15 @@
                     android:text="@string/gps_signal"
                     android:layout_gravity="center_vertical"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:gravity="right"/>
+                    android:gravity="end"/>
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:scaleType="centerInside"
                     android:layout_weight="1"
                     android:id="@+id/ivGPS"
-                    android:src="@drawable/ic_signal_low"/>
+                    android:src="@drawable/ic_signal_low"
+                    android:contentDescription="@string/gps_signal"/>
             </LinearLayout>
 
             <fr.bischof.raphael.gothiite.ui.IntervalView
@@ -88,7 +89,7 @@
                     <EditText
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:id="@+id/etSpeedChoosed"
                         android:inputType="numberSigned"
                         tools:text="14"/>

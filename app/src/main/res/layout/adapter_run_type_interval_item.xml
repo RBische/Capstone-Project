@@ -12,7 +12,7 @@
         android:padding="16dp"
         android:src="@drawable/ic_mover"
         android:layout_gravity="center_vertical"
-        />
+        android:contentDescription="@string/icon_for_the_run_type" />
 
     <TextView
         android:id="@android:id/text1"

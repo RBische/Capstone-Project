@@ -42,6 +42,7 @@
         android:maxWidth="@dimen/detail_icon"
         app:layout_columnWeight="1"
         app:layout_gravity="fill_horizontal"
+        android:contentDescription="@string/icon_for_the_run_type"
         tools:src="@drawable/ic_progression_same"/>
 
     <TextView

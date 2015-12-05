@@ -154,10 +154,13 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
             if (mIvGPS!=null){
                 if (location.getAccuracy()>80){
                     mIvGPS.setImageDrawable(getResources().getDrawable(R.drawable.ic_signal_low));
+                    mIvGPS.setContentDescription(getString(R.string.gps_signal_low));
                 }else if (location.getAccuracy()>30){
                     mIvGPS.setImageDrawable(getResources().getDrawable(R.drawable.ic_signal_medium));
+                    mIvGPS.setContentDescription(getString(R.string.gps_signal_medium));
                 }else{
                     mIvGPS.setImageDrawable(getResources().getDrawable(R.drawable.ic_signal_high));
+                    mIvGPS.setContentDescription(getString(R.string.gps_signal_high));
                 }
             }
         }

@@ -115,4 +115,10 @@
     <string name="must_be_a_number">Number waited</string>
     <string name="index_must_be_between_24_and_0">Endurance index must be between -24 and 0</string>
     <string name="vvo2max_must_be_between_2_and_35">VVo2max must be between 2km/h and 35 km/h</string>
+    <string name="icon_for_the_run_type">Icon used in RunType</string>
+    <string name="app_icon">Icon of the app</string>
+    <string name="gothiite">Gothiite</string>
+    <string name="gps_signal_low">GPS signal low</string>
+    <string name="gps_signal_medium">GPS signal medium</string>
+    <string name="gps_signal_high">GPS signal high</string>
 </resources>

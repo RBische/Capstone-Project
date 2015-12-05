@@ -23,13 +23,15 @@
             android:layout_height="wrap_content"
             android:maxHeight="@dimen/ic_max_height"
             android:layout_gravity="center"
-            android:src="@drawable/shoe"/>
+            android:src="@drawable/shoe"
+            android:contentDescription="@string/app_icon"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:maxHeight="@dimen/title_max_height"
-            android:src="@drawable/ic_title"/>
+            android:src="@drawable/ic_title"
+            android:contentDescription="@string/gothiite"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

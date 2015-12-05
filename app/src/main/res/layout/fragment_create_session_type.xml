@@ -59,6 +59,7 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ico_run"
+                    android:contentDescription="@string/icon_for_the_run_type"
                     />
             </LinearLayout>
 

@@ -125,4 +125,5 @@
         I runned <xliff:g id="meters" example="250">%1$s</xliff:g> meters with a vVO2max equivalent of <xliff:g id="vvo2max" example="15">%2$s</xliff:g>km/h via Gothiite App !
     </string>
     <string name="action_share">Share</string>
+    <string name="transition_icon">icon_transition</string>
 </resources>

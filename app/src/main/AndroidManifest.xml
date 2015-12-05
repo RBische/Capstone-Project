@@ -138,6 +138,16 @@
         <service
             android:name=".service.RunningService"
             android:exported="false" />
+        <receiver android:name=".widget.RunsWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="fr.bischof.raphael.gothiite.app.ACTION_DATA_UPDATED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_runs" />
+        </receiver>
+        <service android:name=".widget.RunsWidgetRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

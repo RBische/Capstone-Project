@@ -22,6 +22,8 @@ import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String EXTRA_RUN_ID_TO_SHOW = "runIdToShow";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
             runFromRunningServiceNotification.setAction(RunningService.ACTION_SHOW_UI_FROM_RUN);
             runFromRunningServiceNotification.putExtra(RunningService.EXTRA_VVO2MAX,getIntent().getDoubleExtra(RunningService.EXTRA_VVO2MAX,0));
             startActivity(runFromRunningServiceNotification);
+        }
+        if(getIntent().hasExtra(EXTRA_RUN_ID_TO_SHOW)){
+            Intent i = new Intent(this, DetailsActivity.class);
+            i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(getIntent().getStringExtra(EXTRA_RUN_ID_TO_SHOW)));
+            startActivity(i);
         }
     }
 

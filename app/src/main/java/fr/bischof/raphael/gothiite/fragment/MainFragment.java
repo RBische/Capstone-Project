@@ -3,7 +3,9 @@ package fr.bischof.raphael.gothiite.fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -113,7 +115,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onClick(String runId, RunAdapter.RunAdapterViewHolder vh) {
         Intent i = new Intent(getActivity(), DetailsActivity.class);
         i.setData(RunContract.RunIntervalEntry.buildRunIntervalsWithRunUri(runId));
-        startActivity(i);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(getActivity(), vh.mIvRun, vh.mIvRun.getTransitionName());
+            getActivity().startActivity(i, options.toBundle());
+        }else{
+            startActivity(i);
+        }
     }
 
     public void removeLoader() {

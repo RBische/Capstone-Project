@@ -36,6 +36,9 @@ public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeInterval
         notifyDataSetChanged();
     }
 
+    /**
+     * Basic viewholder
+     */
     public class RunTypeIntervalViewHolder extends AbstractDraggableItemViewHolder implements View.OnClickListener {
         public ImageView mIvDelete;
         public RelativeLayout mContainer;
@@ -146,6 +149,9 @@ public class RunTypeIntervalAdapter extends RecyclerView.Adapter<RunTypeInterval
         return null;
     }
 
+    /**
+     * Interface to raise click events on a runtype view
+     */
     public interface OnItemClickDeleteListener {
         void onClick(String id, RunTypeIntervalViewHolder vh);
     }

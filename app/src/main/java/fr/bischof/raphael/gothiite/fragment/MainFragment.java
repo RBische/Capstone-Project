@@ -23,14 +23,14 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.DetailsActivity;
-import fr.bischof.raphael.gothiite.activity.SessionTypeActivity;
+import fr.bischof.raphael.gothiite.activity.RunTypeActivity;
 import fr.bischof.raphael.gothiite.adapter.RunAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 
 /**
- * Main fragment of the app
+ * Main fragment of the app that displays runs done
  */
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,RunAdapter.RunAdapterOnClickHandler {
 
@@ -68,7 +68,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         v.findViewById(R.id.fabAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), SessionTypeActivity.class);
+                Intent i = new Intent(getActivity(), RunTypeActivity.class);
                 startActivity(i);
             }
         });
@@ -124,10 +124,16 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         }
     }
 
+    /**
+     * Clears the loader
+     */
     public void removeLoader() {
         getLoaderManager().destroyLoader(RUNS_LOADER);
     }
 
+    /**
+     * Start a new fresh loader
+     */
     public void startLoader() {
         getLoaderManager().initLoader(RUNS_LOADER, null, this);
     }

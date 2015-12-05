@@ -87,6 +87,10 @@ public class GPSFineLocationFragment extends Fragment implements GoogleApiClient
         this.onLocationUpdate(location);
     }
 
+    /**
+     * Method to override to retrieve location updates
+     * @param location The current location
+     */
     protected void onLocationUpdate(Location location){}
 
     @Override

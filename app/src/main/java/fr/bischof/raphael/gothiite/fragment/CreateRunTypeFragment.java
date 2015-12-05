@@ -45,9 +45,9 @@ import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
 
 /**
- * A placeholder fragment containing a simple view.
+ * A fragment that helps user to create a new RunType
  */
-public class CreateSessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, RunTypeIntervalAdapter.OnItemClickDeleteListener{
+public class CreateRunTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, RunTypeIntervalAdapter.OnItemClickDeleteListener{
     private static final int RUN_TYPE_LOADER = 1;
     private static final java.lang.String SAVED_PARSE_ID = "parseId";
     private static final java.lang.String SAVED_EVER_INSERTED = "everInserted";
@@ -75,13 +75,13 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
     private Uri mUri;
     private boolean mEverInserted = false;
 
-    public CreateSessionTypeFragment() {
+    public CreateRunTypeFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_create_session_type, container, false);
+        View v = inflater.inflate(R.layout.fragment_create_run_type, container, false);
         ButterKnife.inject(this, v);
         v.findViewById(R.id.fabAdd).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +153,7 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
 
     private void addItem() {
         saveRunType();
-        DialogFragment newFragment = CreateSessionTypeIntervalFragment.newInstance(mRunTypeID,mAdapter.getItemCount());
+        DialogFragment newFragment = CreateRunTypeIntervalFragment.newInstance(mRunTypeID, mAdapter.getItemCount());
         newFragment.show(getActivity().getSupportFragmentManager(), "runtypeinterval");
     }
 
@@ -178,21 +178,11 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
 
         // drag & drop manager
         mRecyclerViewDragDropManager = new RecyclerViewDragDropManager();
-        //mRecyclerViewDragDropManager.setDraggingItemShadowDrawable(getResources().getDrawable(R.drawable.ic_mover));
 
         mAdapter = new RunTypeIntervalAdapter(getActivity(),this);
         setAdapter();
         final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
         mRecyclerView.setItemAnimator(animator);
-
-        // additional decorations
-        //noinspection StatementWithEmptyBody
-        if (supportsViewElevation()) {
-            // Lollipop or later has native drop shadow feature. ItemShadowDecorator is not required.
-        } else {
-            //mRecyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) getResources().getDrawable(R.drawable.material_shadow_z1)));
-        }
-        //mRecyclerView.addItemDecoration(new SimpleListDividerDecorator(getResources().getDrawable(R.drawable.list_divider), true));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
         mUri = RunContract.RunTypeIntervalEntry.buildRunTypeIntervalsUri();
@@ -328,6 +318,9 @@ public class CreateSessionTypeFragment extends Fragment implements LoaderManager
         dialog.show();
     }
 
+    /**
+     * Deletes the current runtype from the db and stores the fact that it has to be deleted in Parse too
+     */
     public void deleteRunType() {
         final AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle(getString(R.string.confirm)).setMessage(getString(R.string.sure_delete_run_type)).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
             @Override

@@ -107,6 +107,15 @@ public class RunningService extends Service implements GoogleApiClient.Connectio
         return super.onUnbind(intent);
     }
 
+    /**
+     * Starts a run
+     * @param runTypeId Runtype that has to be started
+     * @param runIntervals RunTypeIntervals of the starting run
+     * @param currentRunTypeName RunType name of the starting run
+     * @param vVO2max User defined vVO2max
+     * @param boundActivity Activity that called the bound service
+     * @param listener Listener of the {@link OnRunningServiceUpdateListener} events
+     */
     public void loadRun(String runTypeId, ArrayList<RunTypeInterval> runIntervals, String currentRunTypeName, double vVO2max, Activity boundActivity, OnRunningServiceUpdateListener listener) {
         this.mVVO2max = vVO2max;
         this.mRunTypeId = runTypeId;

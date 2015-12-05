@@ -21,8 +21,10 @@ public class IconAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_image, parent, false);
-        ((ImageView)view.findViewById(R.id.ivIcon)).setImageResource(getContext().getResources().getIdentifier(getItem(position), "drawable", getContext().getPackageName()));
-        return view;
+        if (convertView==null){
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_image, parent, false);
+        }
+        ((ImageView)convertView.findViewById(R.id.ivIcon)).setImageResource(getContext().getResources().getIdentifier(getItem(position), "drawable", getContext().getPackageName()));
+        return convertView;
     }
 }

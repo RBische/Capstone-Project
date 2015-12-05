@@ -1,29 +1,28 @@
 package fr.bischof.raphael.gothiite.activity;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import fr.bischof.raphael.gothiite.R;
-import fr.bischof.raphael.gothiite.fragment.CreateSessionTypeFragment;
+import fr.bischof.raphael.gothiite.fragment.CreateRunTypeFragment;
 
-public class CreateSessionTypeActivity extends AppCompatActivity {
+public class CreateRunTypeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_session_type);
+        setContentView(R.layout.activity_create_run_type);
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
 
             Bundle arguments = new Bundle();
-            if (getIntent().hasExtra(CreateSessionTypeFragment.RUN_TYPE_ID)){
-                arguments.putString(CreateSessionTypeFragment.RUN_TYPE_ID, getIntent().getStringExtra(CreateSessionTypeFragment.RUN_TYPE_ID));
+            if (getIntent().hasExtra(CreateRunTypeFragment.RUN_TYPE_ID)){
+                arguments.putString(CreateRunTypeFragment.RUN_TYPE_ID, getIntent().getStringExtra(CreateRunTypeFragment.RUN_TYPE_ID));
             }
-            CreateSessionTypeFragment fragment = new CreateSessionTypeFragment();
+            CreateRunTypeFragment fragment = new CreateRunTypeFragment();
             fragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
@@ -46,7 +45,7 @@ public class CreateSessionTypeActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_delete){
-            ((CreateSessionTypeFragment)getSupportFragmentManager().findFragmentById(R.id.container)).deleteRunType();
+            ((CreateRunTypeFragment)getSupportFragmentManager().findFragmentById(R.id.container)).deleteRunType();
         }
         return super.onOptionsItemSelected(item);
     }

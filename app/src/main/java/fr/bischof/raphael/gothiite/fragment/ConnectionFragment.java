@@ -24,7 +24,7 @@ import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.sync.GothiiteSyncAdapter;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Fragment that handles the Parse connection
  */
 public class ConnectionFragment extends Fragment implements View.OnClickListener {
 
@@ -141,6 +141,9 @@ public class ConnectionFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    /**
+     * Interface used to raise connection events
+     */
     public interface OnConnectionFragmentEventListener {
         void onConnectionSuccessful();
     }

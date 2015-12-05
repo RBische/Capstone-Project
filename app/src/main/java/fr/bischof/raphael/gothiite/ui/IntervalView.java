@@ -19,16 +19,11 @@ public class IntervalView extends View {
     private Paint paintGreen;
     private Paint paintRed;
     private Paint paintGray;
-    private int mTimeFromBeginning = 0;
+    private int mGrayPartSize = 0;
     private int parentHeight;
     private int parentWidth;
     private List<ColorPart> partsToDraw;
     private int summedSize;
-
-    public void setTimeFromBeginning(int timeFromBeginning) {
-        this.mTimeFromBeginning = timeFromBeginning;
-        invalidate();
-    }
 
     public IntervalView(Context context) {
         super(context);
@@ -87,7 +82,7 @@ public class IntervalView extends View {
         }
         int grayRectangleWidth = 0;
         if (summedSize>0){
-            grayRectangleWidth = parentWidth*mTimeFromBeginning/summedSize;
+            grayRectangleWidth = parentWidth* mGrayPartSize /summedSize;
         }
         canvas.drawRect(new Rect(0, 0, grayRectangleWidth, parentHeight), paintGray);
     }
@@ -102,6 +97,15 @@ public class IntervalView extends View {
         for(ColorPart part:partsToDraw){
             summedSize += part.getPartLength();
         }
+        invalidate();
+    }
+
+    /**
+     * Modifies the width of the gray overlay on the IntervalView
+     * @param grayPartSize The width wanted
+     */
+    public void setGrayPartSize(int grayPartSize) {
+        this.mGrayPartSize = grayPartSize;
         invalidate();
     }
 }

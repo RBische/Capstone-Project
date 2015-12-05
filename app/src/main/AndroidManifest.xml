@@ -94,7 +94,7 @@
                 android:value="fr.bischof.raphael.gothiite.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".activity.SessionTypeActivity"
+            android:name=".activity.RunTypeActivity"
             android:label="@string/title_activity_session_type"
             android:parentActivityName=".activity.MainActivity" >
             <meta-data
@@ -102,20 +102,20 @@
                 android:value="fr.bischof.raphael.gothiite.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".activity.CreateSessionTypeActivity"
+            android:name=".activity.CreateRunTypeActivity"
             android:label="@string/title_activity_create_session_type"
-            android:parentActivityName=".activity.SessionTypeActivity" >
+            android:parentActivityName=".activity.RunTypeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.bischof.raphael.gothiite.activity.SessionTypeActivity" />
+                android:value=".activity.RunTypeActivity" />
         </activity>
         <activity
             android:name=".activity.CreateRunActivity"
             android:label="@string/title_activity_create_run"
-            android:parentActivityName=".activity.SessionTypeActivity" >
+            android:parentActivityName=".activity.RunTypeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="fr.bischof.raphael.gothiite.activity.SessionTypeActivity" />
+                android:value=".activity.RunTypeActivity" />
         </activity>
         <activity
             android:name=".activity.RunActivity"

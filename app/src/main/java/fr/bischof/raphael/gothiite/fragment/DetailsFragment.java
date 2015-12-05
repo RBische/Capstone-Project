@@ -31,7 +31,7 @@ import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.dateformat.DateToShowFormat;
 
 /**
- * A placeholder fragment containing a simple view.
+ * A fragment containing the details of a run (the run is retrieved by the data of the argument {@link DetailsFragment#DETAIL_URI} of the fragment
  */
 public class DetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 

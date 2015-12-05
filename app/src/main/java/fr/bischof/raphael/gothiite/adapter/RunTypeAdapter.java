@@ -54,16 +54,26 @@ public class RunTypeAdapter extends RecyclerView.Adapter<RunTypeAdapter.RunTypeA
         return mCursor.getCount();
     }
 
+    /**
+     * Changes the data of the adapter
+     * @param data new data
+     */
     public void swapCursor(Cursor data) {
         mCursor = data;
         notifyDataSetChanged();
     }
 
+    /**
+     * Interface to raise click events on a runtype view (edit or normal click)
+     */
     public interface RunTypeAdapterOnClickHandler {
         void onClick(String runTypeId, RunTypeAdapterViewHolder vh);
         void onEditClick(String runTypeId, RunTypeAdapterViewHolder vh);
     }
 
+    /**
+     * Basic viewholder
+     */
     public class RunTypeAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mTvTitle;
         public final TextView mTvSubtitle;

@@ -19,11 +19,11 @@ import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
- * Shows a fragment that allows an user to type a session type interval informations.
+ * Shows a fragment that allows an user to type a run type interval informations.
  * This fragment automatically saves this RunTypeInterval on validation.
  * Created by biche on 23/09/2015.
  */
-public class CreateSessionTypeIntervalFragment extends DialogFragment {
+public class CreateRunTypeIntervalFragment extends DialogFragment {
     private static final String ARG_RUN_TYPE_ID = "runTypeId";
     private static final String ARG_ORDER = "order";
     private String mRunTypeId;
@@ -42,7 +42,7 @@ public class CreateSessionTypeIntervalFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         builder.setTitle(getString(R.string.run_type_interval_add));
-        final View customView = inflater.inflate(R.layout.fragment_create_session_type_interval, null);
+        final View customView = inflater.inflate(R.layout.fragment_create_run_type_interval, null);
         builder.setView(customView)
                 // Add action buttons
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -76,15 +76,21 @@ public class CreateSessionTypeIntervalFragment extends DialogFragment {
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        CreateSessionTypeIntervalFragment.this.getDialog().cancel();
+                        CreateRunTypeIntervalFragment.this.getDialog().cancel();
                     }
                 });
         // Create the AlertDialog object and return it
         return builder.create();
     }
 
-    public static CreateSessionTypeIntervalFragment newInstance(String runTypeID, int order) {
-        CreateSessionTypeIntervalFragment fragment = new CreateSessionTypeIntervalFragment();
+    /**
+     * Helper that creates the dialog
+     * @param runTypeID the runTypeId in which the RunTypeInterval will be inserted
+     * @param order the index where the RunTypeInterval will be inserted
+     * @return Instance of the fragment
+     */
+    public static CreateRunTypeIntervalFragment newInstance(String runTypeID, int order) {
+        CreateRunTypeIntervalFragment fragment = new CreateRunTypeIntervalFragment();
         Bundle args = new Bundle();
         args.putString(ARG_RUN_TYPE_ID,runTypeID);
         args.putInt(ARG_ORDER, order);

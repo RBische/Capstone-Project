@@ -23,6 +23,12 @@ public class NumberSynthesizer {
         this.mContext = context;
     }
 
+    /**
+     * Retrieve the strings corresponding to mp3 assets filename depending on the number passed as a parameter
+     * This synthesizer is currently limited to numbers < 1 000 000
+     * @param number The number that will be decomposed
+     * @return The list of strings that has to be played to synthesize the number
+     */
     public ArrayList<String> getSynthesizeNumberAsArrayList(int number){
         String[] parts = synthesizeNumber(number);
         ArrayList<String> arrayListParts = new ArrayList<>();

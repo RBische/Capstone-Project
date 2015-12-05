@@ -27,6 +27,10 @@ public class Synthesizer {
         this.mNumberToSynthesize = numberToSynthesize;
     }
 
+    /**
+     * Retrieve the strings corresponding to mp3 assets filename depending on the numbers and string resource given in the constructor
+     * @return Array of mp3 assets filename
+     */
     public String[] getSynthesizedParts(){
         ArrayList<String> parts = new ArrayList<>();
         String[] splittedBaseParts = mToSynthesize.split("\\|");

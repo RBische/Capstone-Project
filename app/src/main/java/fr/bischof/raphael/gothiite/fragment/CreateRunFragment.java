@@ -64,10 +64,6 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         return inflater.inflate(R.layout.fragment_create_run, container, false);
     }
 
-    /*difficulté des séances en fonction du nombre de période de run
-
-    ajouter niveau de difficulté des séances*/
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -166,6 +162,9 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
         }
     }
 
+    /**
+     * Start a session with the current vVO2max & runTypeId
+     */
     public void launchSession() {
         if(Double.parseDouble(mEtSpeedChoosed.getText().toString())<35&&Double.parseDouble(mEtSpeedChoosed.getText().toString())>2){
             Intent intent = new Intent(getActivity(), RunActivity.class);

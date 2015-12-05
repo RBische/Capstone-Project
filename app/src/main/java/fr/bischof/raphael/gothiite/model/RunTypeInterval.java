@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import fr.bischof.raphael.gothiite.calculator.Calculator;
 
 /**
- * Model class useful during a run
+ * Model for a Run Type Interval stored in DB
  * Created by biche on 29/11/2015.
  */
 public class RunTypeInterval implements Parcelable {

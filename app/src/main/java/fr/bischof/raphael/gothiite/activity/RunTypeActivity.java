@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.service.RunningService;
 
-public class SessionTypeActivity extends AppCompatActivity {
+public class RunTypeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

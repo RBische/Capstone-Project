@@ -52,11 +52,18 @@ public class MediaManager {
         });
     }
 
+    /**
+     * Add an array of strings that represents a list of mp3 assets. To start playing these assets, then execute {@link MediaManager#playSoundsInQueue()}
+     * @param sounds Array of mp3 assets filename
+     */
     public void addToQueue(String[] sounds){
         List<String> arraylistSounds = Arrays.asList(sounds);
         queue.addAll(arraylistSounds);
     }
 
+    /**
+     * Starts playing alls sounds in queue if the player isn't already playing something
+     */
     public void playSoundsInQueue() {
         if(!mPlaying){
             playSoundsRecursively();

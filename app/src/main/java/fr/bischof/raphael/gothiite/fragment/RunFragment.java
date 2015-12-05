@@ -39,7 +39,7 @@ import fr.bischof.raphael.gothiite.ui.ColorPart;
 import fr.bischof.raphael.gothiite.ui.IntervalView;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Fragment bound to a {@link RunningService} showing current user activity
  */
 public class RunFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,OnRunningServiceUpdateListener {
     private static final int RUN_TYPE_LOADER = 1;
@@ -256,7 +256,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                     String minutes = String.format("%02d", millisUntilFinished/60000);
                     int va = (int)( (millisUntilFinished%60000)/1000);
                     String seconds = String.format("%02d", va);
-                    mInvRunType.setTimeFromBeginning((int)(System.currentTimeMillis()-timeStartRun));
+                    mInvRunType.setGrayPartSize((int) (System.currentTimeMillis() - timeStartRun));
                     mTvTimer.setText(getString(R.string.seconds_remaining_textview,minutes,seconds));
                 }
             }
@@ -267,6 +267,10 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
         cT.start();
     }
 
+    /**
+     * Stops the current run
+     * @param withSave If true, the run will be saved in local db
+     */
     public void stopRun(boolean withSave) {
         if (mService!=null){
             mService.endRun(withSave);

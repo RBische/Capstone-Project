@@ -62,6 +62,10 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
         return mCursor.getCount();
     }
 
+    /**
+     * Changes the data of the adapter
+     * @param data new data
+     */
     public void swapCursor(Cursor data) {
         mCursor = data;
         notifyDataSetChanged();
@@ -69,10 +73,16 @@ public class RunAdapter extends RecyclerView.Adapter<RunAdapter.RunAdapterViewHo
         mEmptyView.setVisibility(itemCount == 0 ? View.VISIBLE : View.GONE);
     }
 
+    /**
+     * Interface to raise click events on a run view
+     */
     public interface RunAdapterOnClickHandler {
         void onClick(String runId, RunAdapterViewHolder vh);
     }
 
+    /**
+     * Basic viewholder
+     */
     public class RunAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mTvOtherDetail;
         public final TextView mTvTitle;

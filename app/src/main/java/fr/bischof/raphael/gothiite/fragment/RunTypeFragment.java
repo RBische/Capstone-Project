@@ -21,14 +21,14 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
 import fr.bischof.raphael.gothiite.activity.CreateRunActivity;
-import fr.bischof.raphael.gothiite.activity.CreateSessionTypeActivity;
+import fr.bischof.raphael.gothiite.activity.CreateRunTypeActivity;
 import fr.bischof.raphael.gothiite.adapter.RunTypeAdapter;
 import fr.bischof.raphael.gothiite.data.RunContract;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays all the runtypes from the db
  */
-public class SessionTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,RunTypeAdapter.RunTypeAdapterOnClickHandler {
+public class RunTypeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,RunTypeAdapter.RunTypeAdapterOnClickHandler {
 
     private static final int RUNS_LOADER = 0;
     private static final String[] RUN_TYPES_PROJECTION = {RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry._ID,
@@ -40,13 +40,13 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
     RecyclerView mRvRunTypes;
     private RunTypeAdapter mRunTypeAdapter;
 
-    public SessionTypeFragment() {
+    public RunTypeFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_session_type, container, false);
+        View v = inflater.inflate(R.layout.fragment_run_type, container, false);
         ButterKnife.inject(this, v);
         mRvRunTypes.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRunTypeAdapter = new RunTypeAdapter(getActivity(),this);
@@ -54,7 +54,7 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
         v.findViewById(R.id.fabAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), CreateSessionTypeActivity.class);
+                Intent i = new Intent(getActivity(), CreateRunTypeActivity.class);
                 startActivity(i);
             }
         });
@@ -110,8 +110,8 @@ public class SessionTypeFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onEditClick(String runTypeId, RunTypeAdapter.RunTypeAdapterViewHolder vh) {
-        Intent i = new Intent(getActivity(), CreateSessionTypeActivity.class);
-        i.putExtra(CreateSessionTypeFragment.RUN_TYPE_ID,runTypeId);
+        Intent i = new Intent(getActivity(), CreateRunTypeActivity.class);
+        i.putExtra(CreateRunTypeFragment.RUN_TYPE_ID,runTypeId);
         startActivity(i);
     }
 }

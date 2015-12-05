@@ -121,4 +121,8 @@
     <string name="gps_signal_low">GPS signal low</string>
     <string name="gps_signal_medium">GPS signal medium</string>
     <string name="gps_signal_high">GPS signal high</string>
+    <string name="share_text" >
+        I runned <xliff:g id="meters" example="250">%1$s</xliff:g> meters with a vVO2max equivalent of <xliff:g id="vvo2max" example="15">%2$s</xliff:g>km/h via Gothiite App !
+    </string>
+    <string name="action_share">Share</string>
 </resources>

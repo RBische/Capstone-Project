@@ -1,7 +1,9 @@
 package fr.bischof.raphael.gothiite.fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -11,6 +13,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,6 +26,7 @@ import java.text.DecimalFormat;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import fr.bischof.raphael.gothiite.R;
+import fr.bischof.raphael.gothiite.activity.DetailsActivity;
 import fr.bischof.raphael.gothiite.data.RunContract;
 import fr.bischof.raphael.gothiite.dateformat.DateToShowFormat;
 
@@ -38,14 +44,16 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON,
             RunContract.RunIntervalEntry.TABLE_NAME+"."+RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE
     };
+    private static final String GOTHIITE_SHARE_HASHTAG = " #GothiiteApp";
     @InjectView(R.id.tvStartDate) TextView mTvStartDate;
     @InjectView(R.id.ivProgressionIcon) ImageView mIvProgressionIcon;
     @InjectView(R.id.tvDistanceDone) TextView mTvDistanceDone;
-    @InjectView(R.id.tvProgressionSpeed) TextView mTvProgressionSpeed;
     @InjectView(R.id.tvDistancePerInterval) TextView mTvDistancePerInterval;
     @InjectView(R.id.tvAverageSpeed) TextView mTvAverageSpeed;
     @InjectView(R.id.tvVVO2maxEquivalent) TextView mTvVVO2maxEquivalent;
     private Uri mUri;
+    private double mMeters;
+    private double mVVo2Max;
 
 
     public DetailsFragment() {
@@ -101,7 +109,8 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             String dateText = DateToShowFormat.getFriendlyDayString(getActivity(), date);
             mTvStartDate.setText(dateText);
             mTvAverageSpeed.setText(""+dfShort.format(data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_AVG_SPEED)))+" "+getString(R.string.kmh));
-            mTvVVO2maxEquivalent.setText(""+dfShort.format(data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT)))+" "+getString(R.string.kmh));
+            mVVo2Max = data.getDouble(data.getColumnIndex(RunContract.RunEntry.TABLE_NAME+"."+RunContract.RunEntry.COLUMN_VVO2MAX_EQUIVALENT));
+            mTvVVO2maxEquivalent.setText(""+dfShort.format(mVVo2Max)+" "+getString(R.string.kmh));
             double totalMetersDone = 0;
             String iconResource = data.getString(data.getColumnIndex(RunContract.RunTypeEntry.TABLE_NAME+"."+RunContract.RunTypeEntry.COLUMN_ICON));
             mIvProgressionIcon.setImageResource(getActivity().getResources().getIdentifier(iconResource, "drawable", getActivity().getPackageName()));
@@ -109,6 +118,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 totalMetersDone += data.getDouble(data.getColumnIndex(RunContract.RunIntervalEntry.TABLE_NAME+"."+RunContract.RunIntervalEntry.COLUMN_DISTANCE_DONE));
                 data.moveToNext();
             }
+            mMeters = totalMetersDone;
             if (totalMetersDone>1000){
                 mTvDistanceDone.setText(""+df.format(totalMetersDone / 1000)+" "+getString(R.string.kilometers_abreviation));
             }else{
@@ -119,7 +129,45 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             }else{
                 mTvDistancePerInterval.setText(""+df.format(totalMetersDone / data.getCount())+" "+getString(R.string.meters_per_interval_abreviation));
             }
+            if (getView()!=null){
+                Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
+                if ( null != toolbarView ) {
+                    Menu menu = toolbarView.getMenu();
+                    if ( null != menu ) menu.clear();
+                    toolbarView.inflateMenu(R.menu.menu_details_fragment);
+                    finishCreatingMenu(toolbarView.getMenu());
+                }
+            }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if ( getActivity() instanceof DetailsActivity){
+            // Inflate the menu; this adds items to the action bar if it is present.
+            inflater.inflate(R.menu.menu_details_fragment, menu);
+            finishCreatingMenu(menu);
+        }
+    }
+
+    private void finishCreatingMenu(Menu menu) {
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        menuItem.setIntent(createShareGothiiteIntent());
+    }
+
+    private Intent createShareGothiiteIntent() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat dfShort = new DecimalFormat("#.#");
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        }else{
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        }
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text,df.format(mMeters),dfShort.format(mVVo2Max)) + GOTHIITE_SHARE_HASHTAG);
+        return shareIntent;
     }
 
     @Override

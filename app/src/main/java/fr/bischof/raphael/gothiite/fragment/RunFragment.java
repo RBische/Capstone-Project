@@ -99,7 +99,7 @@ public class RunFragment extends Fragment implements LoaderManager.LoaderCallbac
                 getLoaderManager().initLoader(RUN_TYPE_LOADER, null, this);
             }
         }else{
-            this.mRunIntervals = savedInstanceState.getParcelableArrayList(EXTRA_RUN_INTERVALS);
+            mNeedsToRefreshFromService = true;
         }
         if (getActivity()!=null&& getActivity() instanceof AppCompatActivity){
             Toolbar toolbar = (Toolbar)view.findViewById(R.id.toolbar);

@@ -17,57 +17,65 @@ tools:context="fr.bischof.raphael.gothiite.fragment.RunFragment">
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-        <TextView
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            tools:text="@string/sample_run_type"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:id="@+id/tvRunType" />
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    tools:text="@string/sample_run_type"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:gravity="center_horizontal"
+                    android:id="@+id/tvRunType" />
 
-        <fr.bischof.raphael.gothiite.ui.IntervalView
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:id="@+id/invRunType"/>
+                <fr.bischof.raphael.gothiite.ui.IntervalView
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="16dp"
+                    android:id="@+id/invRunType"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvMetersBeforeNext"
-            tools:text="@string/sample_run_type"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvMetersBeforeNext"
+                    tools:text="@string/sample_run_type"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvTimer"
-            tools:text="@string/sample_run_type"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvTimer"
+                    tools:text="@string/sample_run_type"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvBefore"
-            tools:text="@string/sample_run_type"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvBefore"
+                    tools:text="@string/sample_run_type"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvEffortLeft"
-            tools:text="@string/sample_run_type"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvEffortLeft"
+                    tools:text="@string/sample_run_type"
+                    android:padding="@dimen/activity_horizontal_margin"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
 </FrameLayout>

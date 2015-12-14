@@ -8,7 +8,8 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/col"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -73,4 +74,11 @@
         android:layout_marginTop="@dimen/appbar_height"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:text="@string/empty_run_list"/>
+
+    <!-- view for AdMob Banner Ad -->
+    <com.google.android.gms.ads.AdView android:id="@+id/adView" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id" />
 </FrameLayout>

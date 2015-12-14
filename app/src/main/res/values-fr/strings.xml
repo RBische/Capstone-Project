@@ -1,0 +1,109 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="action_signup_signin">Connexion/Inscription</string>
+    <string name="title_activity_connection">Connexion</string>
+    <string name="login_hint">Identifiant</string>
+    <string name="password_hint">Mot de passe</string>
+    <string name="action_sign_in">Connexion</string>
+    <string name="error_not_enough_length">L\'identifiant ou le mot de passe est trop court</string>
+    <string name="successfully_logged_in">Connecté !</string>
+    <string name="error_connection">Impossible de se connecter, avez-vous une connexion à internet ?</string>
+    <string name="error_sign_in">Un compte existe déjà avec cet identifiant mais le mot de passe est faux</string>
+    <string name="action_log_out">Déconnexion</string>
+    <string name="leger_test_description">La vitesse augmente toutes les 2 minutes</string>
+    <string name="leger_test_name">Test Luc Léger</string>
+    <string name="tabata_description">20s effort * 8 + 10s repos * 8</string>
+    <string name="empty_run_list">Allez courir pour ajouter du contenu !</string>
+    <string name="kmh_vvo2max">km/h VMA</string>
+    <string name="ic_run">Session</string>
+    <string name="title_activity_details">Détails d\'une session</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="average_speed">Vitesse moyenne</string>
+    <string name="vVO2maxEquivalent">Equivalent VMA</string>
+    <string name="today">Ajourd\'hui</string>
+    <string name="tomorrow">Demain</string>
+    <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
+    <string name="kmh">km/h</string>
+    <string name="meters_abreviation">m</string>
+    <string name="kilometers_per_interval_abreviation">km/interval</string>
+    <string name="meters_per_interval_abreviation">m/interval</string>
+    <string name="kilometers_abreviation">km</string>
+    <string name="icon_tabata">ico_run</string>
+    <string name="icon_leger_test">ico_cone</string>
+    <string name="action_add_run">Ajouter une session</string>
+    <string name="title_activity_session_type">Nouvelle session</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_create_session">Nouveau type de session</string>
+    <string name="title_activity_create_session_type">Nouveau type de session</string>
+    <string name="name_hint">Nom</string>
+    <string name="description_hint">Description (Optionnel)</string>
+    <string name="second_effort">s effort</string>
+    <string name="txt_rest">s repos</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Annuler</string>
+    <string name="run_type_interval_add">Ajouter un interval</string>
+    <string name="time_to_do">Temps de course (Secondes)</string>
+    <string name="distance_to_run">Distance à courir (Metres, Optional)</string>
+    <string name="is_an_effort">Est un effort</string>
+    <string name="default_run_type_name">Nouveau type de course</string>
+    <string name="time_to_do_required">Un temps de course est nécessaire</string>
+    <string name="sure_delete_interval">Etes-vous sur de vouloir supprimer cet interval ?</string>
+    <string name="confirm">Confirmation</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="delete">Supprimer</string>
+    <string name="sure_delete_run_type">Etes-vous sur de vouloir supprimer ce type de session ?</string>
+    <string name="edit">Modifier</string>
+    <string name="choose_icon">Choisissez une icône</string>
+    <string name="title_activity_create_run">Nouvelle session</string>
+    <string name="error_save_user_id">Impossible de sauvegarder l\'utilisateur après la connexion, reconnectez-vous.</string>
+    <string name="action_wipe_data">Remettre à zéro</string>
+    <string name="sure_wipe_data">Etes-vous sur de vouloir supprimer toutes les informations de l\'application ?</string>
+    <string name="action_sync">Synchroniser</string>
+    <string name="gps_signal">Signal GPS</string>
+    <string name="sample_description">20s effort * 8 + 10s repos * 8</string>
+    <string name="sample_run_type">Tabata</string>
+    <string name="sample_last_speed">VMA (dernière 14 km/h)</string>
+    <string name="speed_unit">km/h</string>
+    <string name="last_speed_start">VMA</string>
+    <string name="last_speed_mid">dernière</string>
+    <string name="last_speed_end">km/h</string>
+    <string name="action_run">GO</string>
+    <string name="title_activity_run">Course</string>
+    <string name="now_running">Course en cours</string>
+    <string name="before_stop">avant de s\'arrêter</string>
+    <string name="before_effort">avant de courir</string>
+    <string name="before_rest">avant une phase de repos</string>
+    <string name="action_stop">Stop</string>
+    <string name="sure_stop_run">Etes-vous sur de vouloir arrêter cette session ?</string>
+    <string name="left">restant</string>
+    <string name="meters_done_textview">
+        <xliff:g id="meters" example="15">%1$s</xliff:g> metres
+    </string>
+    <string name="meters_left_textview">
+        <xliff:g id="meters" example="15">%1$s</xliff:g> metres restant
+    </string>
+    <string name="seconds_remaining_textview">
+        <xliff:g id="minutes" example="15">%1$s</xliff:g>:<xliff:g id="seconds" example="15">%2$s</xliff:g> secondes restantes
+    </string>
+    <string name="action_temp">Dire un nombre</string>
+    <string name="pref_ie_label">Indice d\'endurance</string>
+    <string name="pref_ie_default">-6.5</string>
+    <string name="title_activity_settings">Paramètres</string>
+    <string name="pref_language_pack_label">Pack de langue</string>
+    <string name="pref_language_pack_key">pref_language_pack</string>
+    <string name="pref_language_pack_default">fr</string>
+    <string name="must_be_a_number">Veuillez taper un nomber</string>
+    <string name="index_must_be_between_24_and_0">L\'indice d\'endurance doit être compris entre -24 et 0</string>
+    <string name="vvo2max_must_be_between_2_and_35">La VMA doit être comprise entre 2km/h et 35 km/h</string>
+    <string name="icon_for_the_run_type">Icône utilisée dans le type de session</string>
+    <string name="app_icon">Icône de l\'application</string>
+    <string name="gothiite">Gothiite</string>
+    <string name="gps_signal_low">Signal GPS faible</string>
+    <string name="gps_signal_medium">Signal GPS moyen</string>
+    <string name="gps_signal_high">Bon signal GPS</string>
+    <string name="share_text" >
+        J\'ai couru <xliff:g id="meters" example="250">%1$s</xliff:g> mètres avec une VMA équivalente de <xliff:g id="vvo2max" example="15">%2$s</xliff:g>km/h grâce à l\'application Gothiite !
+    </string>
+    <string name="action_share">Partager</string>
+    <string name="transition_icon">icon_transition</string>
+</resources>

@@ -14,5 +14,6 @@ public class GotHiiteApplication extends Application {
         super.onCreate();
         // Initialize parse
         Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
+        AnalyticsTrackers.initialize(getApplicationContext());
     }
 }

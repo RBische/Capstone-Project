@@ -79,10 +79,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Load an ad into the AdMob banner view.
-        AdView adView = (AdView) view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+        View v = view.findViewById(R.id.adView);
+        if (v!=null){
+            AdView adView = (AdView) v;
+            AdRequest adRequest = new AdRequest.Builder()
+                    .setRequestAgent("android_studio:ad_template").addTestDevice("EA386A99E50D1A299261A06D370FE069").build();
+            adView.loadAd(adRequest);
+        }
         startLoader();
     }
 

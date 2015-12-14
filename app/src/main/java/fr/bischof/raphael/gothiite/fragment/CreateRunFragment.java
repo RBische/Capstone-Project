@@ -166,6 +166,7 @@ public class CreateRunFragment extends GPSFineLocationFragment implements Loader
      * Start a session with the current vVO2max & runTypeId
      */
     public void launchSession() {
+        if(!mEtSpeedChoosed.getText().toString().equals(""))
         if(Double.parseDouble(mEtSpeedChoosed.getText().toString())<35&&Double.parseDouble(mEtSpeedChoosed.getText().toString())>2){
             Intent intent = new Intent(getActivity(), RunActivity.class);
             intent.setData(getActivity().getIntent().getData());

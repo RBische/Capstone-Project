@@ -162,7 +162,7 @@ public class CreateRunTypeFragment extends Fragment implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
         outState.putString(SAVED_PARSE_ID, mRunTypeID);
         outState.putBoolean(SAVED_EVER_INSERTED, mEverInserted);
-        outState.putString(SAVED_ICON,mIconChoosed);
+        outState.putString(SAVED_ICON, mIconChoosed);
     }
 
     @Override
@@ -242,17 +242,19 @@ public class CreateRunTypeFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        List<ColorPart> partsToDraw = new ArrayList<>();
-        while (data.moveToNext()) {
-            boolean effort = data.getInt(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
-            long time = data.getLong(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
-            int timeInSec = (int)time;
-            ColorPart part = new ColorPart(timeInSec,!effort);
-            partsToDraw.add(part);
+        if (data!=null){
+            List<ColorPart> partsToDraw = new ArrayList<>();
+            while (data.moveToNext()) {
+                boolean effort = data.getInt(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_EFFORT))==1;
+                long time = data.getLong(data.getColumnIndex(RunContract.RunTypeIntervalEntry.COLUMN_TIME_TO_DO));
+                int timeInSec = (int)time;
+                ColorPart part = new ColorPart(timeInSec,!effort);
+                partsToDraw.add(part);
+            }
+            mInvRunType.updateParts(partsToDraw);
+            data.moveToFirst();
+            mAdapter.swapCursor(data);
         }
-        mInvRunType.updateParts(partsToDraw);
-        data.moveToFirst();
-        mAdapter.swapCursor(data);
     }
 
     @Override

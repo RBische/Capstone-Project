@@ -16,7 +16,7 @@ import fr.bischof.raphael.gothiite.R;
 public class RunDbHelper  extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 14;
     private Context mContext;
 
     static final String DATABASE_NAME = "run.db";
